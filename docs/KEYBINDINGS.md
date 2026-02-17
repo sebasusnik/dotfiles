@@ -1,286 +1,286 @@
 # ⌨️ Keybindings Cheatsheet - NVIM ZEN
 
-> Todos los atajos de teclado de mi configuración de Neovim
+> All keyboard shortcuts for my Neovim configuration
 
-## 📁 Navegación y Archivos
+## 📁 Navigation and Files
 
 ### Neo-tree (File Explorer)
 ```
 <leader>e       Toggle Neo-tree
 <leader>o       Focus Neo-tree
--               Reveal archivo actual en Neo-tree
+-               Reveal current file in Neo-tree
 
-Dentro de Neo-tree:
-<CR>            Abrir archivo / Entrar carpeta
--               Subir un nivel
+Inside Neo-tree:
+<CR>            Open file / Enter folder
+-               Go up one level
 ```
 
-### Telescope (Búsqueda Fuzzy)
+### Telescope (Fuzzy Search)
 ```
-<leader>f       Buscar archivos
-<leader>g       Buscar texto en proyecto (live grep)
-<leader>/       Buscar en archivo actual
-<leader>b       Buscar buffers abiertos
-<leader>*       Buscar palabra bajo cursor en proyecto
+<leader>f       Find files
+<leader>g       Search text in project (live grep)
+<leader>/       Search in current file
+<leader>b       Search open buffers
+<leader>*       Search word under cursor in project
 
-Dentro de Telescope:
-<Esc>           Cerrar
-<C-j>           Siguiente resultado
-<C-k>           Anterior resultado
-```
-
-## 💾 Básicos
-
-### Archivo (comandos nativos de Vim)
-```
-:w              Guardar
-:q              Salir
-:q!             Salir sin guardar
-:x / :wq        Guardar y salir
+Inside Telescope:
+<Esc>           Close
+<C-j>           Next result
+<C-k>           Previous result
 ```
 
-### Ventanas (Splits)
+## 💾 Basics
+
+### File (native Vim commands)
 ```
-<C-h>           Ir a panel izquierda
-<C-l>           Ir a panel derecha
-<C-j>           Ir a panel abajo
-<C-k>           Ir a panel arriba
+:w              Save
+:q              Quit
+:q!             Quit without saving
+:x / :wq        Save and quit
+```
+
+### Windows (Splits)
+```
+<C-h>           Go to left panel
+<C-l>           Go to right panel
+<C-j>           Go to panel below
+<C-k>           Go to panel above
 ```
 
 ## 🤖 AI Integration (Claude Code + OpenCode)
 
-### Enviar código al AI
+### Send code to AI
 ```
-<leader>ac      Enviar selección visual
-<leader>aa      Enviar archivo completo
-<leader>af      Enviar función/type/enum donde está el cursor ⭐
-<leader>at      Enviar type/interface donde está el cursor (obsoleto, usa af)
-<leader>al      Enviar líneas específicas (te pregunta rango)
-<leader>ad      Enviar git diff del archivo
-<leader>ao      Enviar estructura del proyecto
+<leader>ac      Send visual selection
+<leader>aa      Send entire file
+<leader>af      Send function/type/enum where cursor is ⭐
+<leader>at      Send type/interface where cursor is (obsolete, use af)
+<leader>al      Send specific lines (prompts for range)
+<leader>ad      Send git diff of file
+<leader>ao      Send project structure
 ```
 
-**Nota:** `<leader>af` ahora es inteligente - detecta automáticamente si estás en una función, type, interface o enum!
+**Note:** `<leader>af` is now smart - automatically detects if you're in a function, type, interface or enum!
 
 ## 🎯 Textobjects (Treesitter)
 
-### Selección
+### Selection
 ```
-vaf / vif       Seleccionar función/type/enum/interface (outer/inner) ⭐
-vac / vic       Seleccionar clase (outer/inner)
-vaa / via       Seleccionar parámetro (outer/inner)
-vai / vii       Seleccionar condicional (outer/inner)
-val / vil       Seleccionar loop (outer/inner)
-vab / vib       Seleccionar bloque (outer/inner)
-va/             Seleccionar comentario
-```
-
-**Nota:** `vaf` es inteligente - funciona tanto para funciones como para types, interfaces y enums en TypeScript!
-
-### Navegación entre declaraciones (Modo Sticky 🔥)
-```
-<leader>n + ] / [   Navegar declaraciones: funciones, types, variables, etc.
-<Esc>               Salir del modo sticky
+vaf / vif       Select function/type/enum/interface (outer/inner) ⭐
+vac / vic       Select class (outer/inner)
+vaa / via       Select parameter (outer/inner)
+vai / vii       Select conditional (outer/inner)
+val / vil       Select loop (outer/inner)
+vab / vib       Select block (outer/inner)
+va/             Select comment
 ```
 
-**Modo Sticky 🔥:** Presiona `Space + n` una vez, luego `j` o `k` repetidamente para saltar entre cualquier declaración (funciones, types, interfaces, enums, variables)!
+**Note:** `vaf` is smart - works for both functions and types, interfaces and enums in TypeScript!
 
-### Navegación estándar (sin sticky)
+### Navigation between declarations (Sticky Mode 🔥)
 ```
-]m / [m         Siguiente/anterior declaración (funciones, types, variables, etc.)
-]c / [c         Siguiente/anterior clase
-]l / [l         Siguiente/anterior loop
-]i / [i         Siguiente/anterior condicional
-]b / [b         Siguiente/anterior bloque
-]a / [a         Siguiente/anterior parámetro
+<leader>n + ] / [   Navigate declarations: functions, types, variables, etc.
+<Esc>               Exit sticky mode
 ```
 
-### Swap (Intercambiar)
+**Sticky Mode 🔥:** Press `Space + n` once, then `j` or `k` repeatedly to jump between any declaration (functions, types, interfaces, enums, variables)!
+
+### Standard navigation (without sticky)
 ```
-<leader>sn      Swap con siguiente parámetro
-<leader>sp      Swap con parámetro anterior
+]m / [m         Next/previous declaration (functions, types, variables, etc.)
+]c / [c         Next/previous class
+]l / [l         Next/previous loop
+]i / [i         Next/previous conditional
+]b / [b         Next/previous block
+]a / [a         Next/previous parameter
+```
+
+### Swap (Exchange)
+```
+<leader>sn      Swap with next parameter
+<leader>sp      Swap with previous parameter
 ```
 
 ## 📝 LSP (Language Server)
 
-### Navegación de código
+### Code navigation
 ```
 gd              Go to definition
-K               Hover (documentación)
-<leader>rn      Rename símbolo
+K               Hover (documentation)
+<leader>rn      Rename symbol
 <leader>ca      Code actions
 ```
 
-## 🔍 Selección Visual
+## 🔍 Visual Selection
 
 ### Incremental (Treesitter)
 ```
-<CR>            Iniciar/expandir selección
-<BS>            Contraer selección
-<TAB>           Expandir por scope
+<CR>            Start/expand selection
+<BS>            Shrink selection
+<TAB>           Expand by scope
 ```
 
-### Útiles
+### Useful
 ```
-V               Modo visual línea
-v               Modo visual carácter
-<C-v>           Modo visual bloque
-gv              Restaurar última selección visual
-<Esc>           Salir de modo visual (guarda marcas)
-```
-
-## 🎨 Workflow: Seleccionar y enviar al AI
-
-### Opción 1: Selección manual
-```
-1. V            Iniciar selección visual
-2. jjj          Seleccionar líneas
-3. <leader>ac   Enviar al AI
+V               Visual line mode
+v               Visual character mode
+<C-v>           Visual block mode
+gv              Restore last visual selection
+<Esc>           Exit visual mode (saves marks)
 ```
 
-### Opción 2: Con textobjects
+## 🎨 Workflow: Select and send to AI
+
+### Option 1: Manual selection
 ```
-1. vaf          Seleccionar función
-2. <Esc>        Salir (marcas persisten 3 seg)
-3. Scrollea para revisar
-4. gv           Restaurar selección
-5. <leader>ac   Enviar al AI
+1. V            Start visual selection
+2. jjj          Select lines
+3. <leader>ac   Send to AI
 ```
 
-### Opción 3: Directo
+### Option 2: With textobjects
 ```
-<leader>af      Envía función directamente (sin seleccionar)
-<leader>at      Envía type/interface directamente
+1. vaf          Select function
+2. <Esc>        Exit (marks persist 3 sec)
+3. Scroll to review
+4. gv           Restore selection
+5. <leader>ac   Send to AI
+```
+
+### Option 3: Direct
+```
+<leader>af      Send function directly (without selecting)
+<leader>at      Send type/interface directly
 ```
 
 ## 🎨 Visual Feedback
 
-- **Selección activa**: Color gris `#4a4a4a`
-- **Marcas después de salir**: Color gris sutil `#3a3a3a` (dura 3 segundos)
-- Permite scrollear y revisar antes de enviar al AI
+- **Active selection**: Gray color `#4a4a4a`
+- **Marks after exiting**: Subtle gray color `#3a3a3a` (lasts 3 seconds)
+- Allows scrolling and reviewing before sending to AI
 
-## 🔧 Git (comandos útiles)
+## 🔧 Git (useful commands)
 
-### En Neovim (Gitsigns)
+### In Neovim (Gitsigns)
 ```
-]h / [h         Siguiente/anterior cambio (hunk)
-<leader>hp      Preview cambio
-<leader>hs      Stage cambio
-<leader>hr      Reset cambio (descartar)
+]h / [h         Next/previous change (hunk)
+<leader>hp      Preview change
+<leader>hs      Stage change
+<leader>hr      Reset change (discard)
 ```
 
-### En terminal (git nativos)
+### In terminal (native git)
 ```
-git status      Ver estado del repo
-git add .       Agregar todos los cambios
-git commit -m   Commit con mensaje
-git push        Subir cambios
-git pull        Bajar cambios
-git log         Ver historial
-git diff        Ver cambios sin stagear
-git diff --cached  Ver cambios staged
+git status      View repo status
+git add .       Add all changes
+git commit -m   Commit with message
+git push        Push changes
+git pull        Pull changes
+git log         View history
+git diff        View unstaged changes
+git diff --cached  View staged changes
 ```
 
 ## 📦 Tmux (Terminal multiplexer)
 
-**Nota:** Tu prefix key es `Ctrl+a` (no el default `Ctrl+b`)
+**Note:** Your prefix key is `Ctrl+a` (not the default `Ctrl+b`)
 
-### Copy mode (selección y copiado)
+### Copy mode (selection and copying)
 ```
-Ctrl+a [        Entrar en copy mode
-Ctrl+a PgUp     Entrar en copy mode (alternativo)
+Ctrl+a [        Enter copy mode
+Ctrl+a PgUp     Enter copy mode (alternative)
 
-Dentro de copy mode (vi-mode):
-h j k l         Moverse (vim keys)
-w / b           Siguiente/anterior palabra
-0 / $           Inicio/final de línea
-g / G           Inicio/final del buffer
-/texto          Buscar hacia adelante
-?texto          Buscar hacia atrás
-n / N           Siguiente/anterior resultado
+Inside copy mode (vi-mode):
+h j k l         Move (vim keys)
+w / b           Next/previous word
+0 / $           Start/end of line
+g / G           Start/end of buffer
+/text           Search forward
+?text           Search backward
+n / N           Next/previous result
 
-v               Iniciar selección (vi-style)
-y / Enter       Copiar selección y salir
-q / Esc         Salir sin copiar
+v               Start selection (vi-style)
+y / Enter       Copy selection and exit
+q / Esc         Exit without copying
 
-Ctrl+a ]        Pegar lo copiado
-```
-
-### Workflow: Copiar desde tmux
-```
-1. Ctrl+a [     Entrar en copy mode
-2. Navegar con vim keys (h j k l)
-3. v            Iniciar selección (vi-style)
-4. Seleccionar con movimiento
-5. y o Enter    Copiar al clipboard
-6. Cmd+V        Pegar en cualquier aplicación
+Ctrl+a ]        Paste copied text
 ```
 
-### Splits y paneles
+### Workflow: Copy from tmux
 ```
-Ctrl+a |        Split vertical (izq/der)
-Ctrl+a -        Split horizontal (arriba/abajo)
-Ctrl+h/j/k/l    Navegar entre paneles (sin prefix!)
-Ctrl+a x        Cerrar panel actual
-```
-
-### Otras útiles
-```
-Ctrl+a c        Crear nueva ventana
-Ctrl+a n        Siguiente ventana
-Ctrl+a p        Anterior ventana
-Ctrl+a d        Detach de la sesión
-Ctrl+a r        Recargar tmux.conf
+1. Ctrl+a [     Enter copy mode
+2. Navigate with vim keys (h j k l)
+3. v            Start selection (vi-style)
+4. Select with movement
+5. y or Enter   Copy to clipboard
+6. Cmd+V        Paste in any application
 ```
 
-## 🎯 Movimiento (Vim nativo)
-
-### Movimiento básico
+### Splits and panes
 ```
-h j k l         Izquierda, Abajo, Arriba, Derecha
-w / b           Siguiente/anterior palabra
-e               Final de palabra
-0 / $           Inicio/final de línea
-gg / G          Inicio/final del archivo
-{ / }           Párrafo anterior/siguiente
-<C-d> / <C-u>   Media página abajo/arriba
-<C-f> / <C-b>   Página completa abajo/arriba
-zz              Centrar cursor en pantalla
+Ctrl+a |        Vertical split (left/right)
+Ctrl+a -        Horizontal split (top/bottom)
+Ctrl+h/j/k/l    Navigate between panes (no prefix!)
+Ctrl+a x        Close current pane
 ```
 
-### Buscar y saltar
+### Other useful
 ```
-/texto          Buscar hacia adelante
-?texto          Buscar hacia atrás
-n / N           Siguiente/anterior resultado
-*               Buscar palabra bajo cursor
-f{char}         Saltar a carácter en línea
-t{char}         Saltar antes de carácter
-; / ,           Repetir f/t adelante/atrás
+Ctrl+a c        Create new window
+Ctrl+a n        Next window
+Ctrl+a p        Previous window
+Ctrl+a d        Detach from session
+Ctrl+a r        Reload tmux.conf
 ```
 
-### Marcas
+## 🎯 Movement (Native Vim)
+
+### Basic movement
 ```
-m{a-z}          Crear marca local
-m{A-Z}          Crear marca global
-'{a-z}          Saltar a marca
-''              Saltar a posición anterior
-`.              Saltar a último cambio
+h j k l         Left, Down, Up, Right
+w / b           Next/previous word
+e               End of word
+0 / $           Start/end of line
+gg / G          Start/end of file
+{ / }           Previous/next paragraph
+<C-d> / <C-u>   Half page down/up
+<C-f> / <C-b>   Full page down/up
+zz              Center cursor on screen
 ```
 
-## ✏️ Edición (Vim nativo)
-
-### Cambiar/Borrar
+### Search and jump
 ```
-c               Change (cambiar + insertar)
-d               Delete (borrar)
-y               Yank (copiar)
-p / P           Paste después/antes
-x               Borrar carácter
-r{char}         Reemplazar carácter
+/text           Search forward
+?text           Search backward
+n / N           Next/previous result
+*               Search word under cursor
+f{char}         Jump to character in line
+t{char}         Jump before character
+; / ,           Repeat f/t forward/backward
+```
+
+### Marks
+```
+m{a-z}          Create local mark
+m{A-Z}          Create global mark
+'{a-z}          Jump to mark
+''              Jump to previous position
+`.              Jump to last change
+```
+
+## ✏️ Editing (Native Vim)
+
+### Change/Delete
+```
+c               Change (change + insert)
+d               Delete
+y               Yank (copy)
+p / P           Paste after/before
+x               Delete character
+r{char}         Replace character
 u               Undo
 <C-r>           Redo
-.               Repetir último comando
+.               Repeat last command
 ```
 
 ### Operator + Motion
@@ -291,46 +291,46 @@ ya{             Yank around brackets
 cit             Change inside tag
 ```
 
-### Buscar y reemplazar
+### Search and replace
 ```
-:s/old/new      Reemplazar en línea actual
-:s/old/new/g    Reemplazar todos en línea
-:%s/old/new/g   Reemplazar en todo el archivo
-:%s/old/new/gc  Reemplazar con confirmación
-```
-
-### Múltiples líneas
-```
-V               Visual línea
-<C-v>           Visual bloque
-J               Unir líneas
->               Indentar
-<               Des-indentar
+:s/old/new      Replace in current line
+:s/old/new/g    Replace all in line
+:%s/old/new/g   Replace in entire file
+:%s/old/new/gc  Replace with confirmation
 ```
 
-### Mover líneas (<leader>m + j/k - Modo Sticky)
+### Multiple lines
 ```
-<leader>m       Entrar en modo "mover" (sticky)
-j               Mover línea/selección abajo (repetir sin Space)
-k               Mover línea/selección arriba (repetir sin Space)
-<Esc>           Salir del modo sticky
+V               Visual line
+<C-v>           Visual block
+J               Join lines
+>               Indent
+<               Un-indent
 ```
 
-**Nota:** Modo "sticky" = presionas `Space + m` una vez, luego solo `j j j` o `k k k` repetidamente.
+### Move lines (<leader>m + j/k - Sticky Mode)
+```
+<leader>m       Enter "move" mode (sticky)
+j               Move line/selection down (repeat without Space)
+k               Move line/selection up (repeat without Space)
+<Esc>           Exit sticky mode
+```
+
+**Note:** "Sticky" mode = press `Space + m` once, then just `j j j` or `k k k` repeatedly.
 
 **Workflow:**
 ```
-1. vaf           Seleccionar función
-2. <leader>m     Entrar en modo mover (sale de visual, guarda posiciones)
-3. j j j j       Mover abajo varias veces (sin presionar Space)
-4. <Esc>         Salir de modo sticky
+1. vaf           Select function
+2. <leader>m     Enter move mode (exits visual, saves positions)
+3. j j j j       Move down several times (without pressing Space)
+4. <Esc>         Exit sticky mode
 ```
 
 ## 📋 Tips
 
 - `<leader>` = `Space`
-- Los textobjects funcionan en modo visual (`v`) y operator-pending (`d`, `y`, `c`)
-- Ejemplos: `daf` (delete function), `yaf` (yank function), `cif` (change inner function)
-- Las marcas visuales (`'<` y `'>`) se guardan al salir del modo visual
-- **Filosofía de Vim:** operator + motion (ej: `d` + `iw` = delete inner word)
-- Combina textobjects con operators: `daf` (delete a function), `yip` (yank inner paragraph)
+- Textobjects work in visual mode (`v`) and operator-pending (`d`, `y`, `c`)
+- Examples: `daf` (delete function), `yaf` (yank function), `cif` (change inner function)
+- Visual marks (`'<` and `'>`) are saved when exiting visual mode
+- **Vim philosophy:** operator + motion (e.g., `d` + `iw` = delete inner word)
+- Combine textobjects with operators: `daf` (delete a function), `yip` (yank inner paragraph)

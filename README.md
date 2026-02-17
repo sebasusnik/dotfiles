@@ -1,84 +1,84 @@
 # 🚀 Dotfiles - NVIM ZEN + AI Workflow
 
-Configuración minimalista y zen para desarrollo con Neovim, Tmux, Claude Code/OpenCode, y Oh My Posh.
+Minimalist and zen configuration for development with Neovim, Tmux, Claude Code/OpenCode, and Oh My Posh.
 
-## 📦 Contenido
+## 📦 Contents
 
-- **Neovim** - Setup completo con LSP, autocompletado, y plugins esenciales
-- **Tmux** - Configuración para workflow con Neovim + OpenCode
-- **Zsh** - Shell configuration con Oh My Posh
-- **Oh My Posh** - Terminal prompt personalizado
+- **Neovim** - Complete setup with LSP, autocompletion, and essential plugins
+- **Tmux** - Configuration for workflow with Neovim + OpenCode
+- **Zsh** - Shell configuration with Oh My Posh
+- **Oh My Posh** - Custom terminal prompt
 
 ## ✨ Features
 
 ### Neovim
-- 🎨 LSP configurado para TypeScript/JavaScript (typescript-tools)
-- 🔍 Fuzzy finding con Telescope
-- 📁 Explorador de archivos con git colors nativos (neo-tree)
-- ✍️ Autocompletado con nvim-cmp
-- 🎯 Treesitter para syntax highlighting
-- 🔧 Formateo con conform.nvim y linting con nvim-lint
-- 🌿 Git integration con gitsigns
-- 🧘 Zen mode para concentración
+- 🎨 LSP configured for TypeScript/JavaScript (typescript-tools)
+- 🔍 Fuzzy finding with Telescope
+- 📁 File explorer with native git colors (neo-tree)
+- ✍️ Autocompletion with nvim-cmp
+- 🎯 Treesitter for syntax highlighting
+- 🔧 Formatting with conform.nvim and linting with nvim-lint
+- 🌿 Git integration with gitsigns
+- 🧘 Zen mode for focus
 
 ### Tmux
-- ⌨️ Navegación con Ctrl+H/J/K/L (igual que Neovim)
-- 🖱️ Mouse support habilitado
-- 🎨 Status bar minimalista
-- ⚡ Prefix key: Ctrl+A (en lugar de Ctrl+B)
-- 📋 Copy mode con vi-keys y clipboard integration
+- ⌨️ Navigation with Ctrl+H/J/K/L (same as Neovim)
+- 🖱️ Mouse support enabled
+- 🎨 Minimalist status bar
+- ⚡ Prefix key: Ctrl+A (instead of Ctrl+B)
+- 📋 Copy mode with vi-keys and clipboard integration
 
 ### AI Workflow
-- 🤖 Integración completa con **Claude Code** y **OpenCode**
-- 🚀 Comando `dev` para iniciar workspace tmux con Neovim + AI tool
-- 📤 Shortcuts para enviar código desde Neovim al AI (selecciones, funciones, archivos)
-- 🎯 Workflow optimizado para pair programming con Claude o OpenCode
-- ⚡ Cambio rápido entre Claude Code y OpenCode (`dev claude` / `dev opencode`)
+- 🤖 Full integration with **Claude Code** and **OpenCode**
+- 🚀 `dev` command to start tmux workspace with Neovim + AI tool
+- 📤 Shortcuts to send code from Neovim to AI (selections, functions, files)
+- 🎯 Optimized workflow for pair programming with Claude or OpenCode
+- ⚡ Quick switch between Claude Code and OpenCode (`dev claude` / `dev opencode`)
 
-## 🛠️ Prerequisitos
+## 🛠️ Prerequisites
 
-> **Nota:** El script de instalación puede manejar la mayoría de estas dependencias automáticamente. Ve directamente a [Instalación](#-instalación) si prefieres que el script lo haga por ti.
+> **Note:** The installation script can handle most of these dependencies automatically. Go directly to [Installation](#-installation) if you prefer the script to do it for you.
 
 ### macOS
 ```bash
-# Instalar Homebrew si no lo tienes (o deja que el script lo haga)
+# Install Homebrew if you don't have it (or let the script do it)
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Instalar dependencias (o deja que el script lo haga)
+# Install dependencies (or let the script do it)
 brew install neovim tmux ripgrep node
-brew install --cask font-hack-nerd-font  # O tu Nerd Font favorita
+brew install --cask font-hack-nerd-font  # Or your favorite Nerd Font
 
-# Instalar Oh My Posh (o deja que el script lo haga)
+# Install Oh My Posh (or let the script do it)
 brew install jandedobbeleer/oh-my-posh/oh-my-posh
 
-# Instalar AI tools (opcional pero recomendado)
+# Install AI tools (optional but recommended)
 npm install -g @anthropic-ai/claude-code  # Claude Code CLI
-npm install -g opencode                   # OpenCode (alternativa)
+npm install -g opencode                   # OpenCode (alternative)
 ```
 
 ### Linux (Debian/Ubuntu/Raspberry Pi)
 
-> **Nota:** El script de instalación puede instalar estas dependencias automáticamente.
+> **Note:** The installation script can install these dependencies automatically.
 
 ```bash
-# Actualizar repositorios
+# Update repositories
 sudo apt update
 
-# Instalar dependencias básicas (o deja que el script lo haga)
+# Install basic dependencies (or let the script do it)
 sudo apt install -y neovim tmux ripgrep nodejs npm git curl build-essential
 
-# Instalar Ghostty (opcional - terminal moderno)
-# Ver: https://ghostty.org/docs/install/build
-# O usar tu terminal actual (alacritty, kitty, etc)
+# Install Ghostty (optional - modern terminal)
+# See: https://ghostty.org/docs/install/build
+# Or use your current terminal (alacritty, kitty, etc)
 
-# Instalar Oh My Posh (prompt personalizado - opcional)
+# Install Oh My Posh (custom prompt - optional)
 curl -s https://ohmyposh.dev/install.sh | bash -s
 
-# Instalar AI tools (opcional pero recomendado)
+# Install AI tools (optional but recommended)
 npm install -g @anthropic-ai/claude-code  # Claude Code CLI
-npm install -g opencode                   # OpenCode (alternativa)
+npm install -g opencode                   # OpenCode (alternative)
 
-# Opcional: Instalar Nerd Font
+# Optional: Install Nerd Font
 mkdir -p ~/.local/share/fonts
 cd ~/.local/share/fonts
 curl -fLo "Hack Bold Nerd Font Complete.ttf" \
@@ -88,38 +88,38 @@ fc-cache -fv
 
 ### Linux (Fedora/RHEL)
 ```bash
-# Instalar dependencias
+# Install dependencies
 sudo dnf install -y neovim tmux ripgrep nodejs npm git curl gcc gcc-c++ make
 
-# Instalar Oh My Posh (opcional)
+# Install Oh My Posh (optional)
 curl -s https://ohmyposh.dev/install.sh | bash -s
 
-# Instalar AI tools
+# Install AI tools
 npm install -g @anthropic-ai/claude-code
 npm install -g opencode
 ```
 
 ### Linux (Arch)
 ```bash
-# Instalar dependencias
+# Install dependencies
 sudo pacman -S neovim tmux ripgrep nodejs npm git curl base-devel
 
-# Instalar Oh My Posh (opcional - también está en AUR)
+# Install Oh My Posh (optional - also available in AUR)
 curl -s https://ohmyposh.dev/install.sh | bash -s
-# O desde AUR: yay -S oh-my-posh
+# Or from AUR: yay -S oh-my-posh
 
-# Instalar AI tools
+# Install AI tools
 npm install -g @anthropic-ai/claude-code
 npm install -g opencode
 ```
 
-## 📥 Instalación
+## 📥 Installation
 
-### Opción 1: Instalación Automática (Recomendado) ⚡
+### Option 1: Automatic Installation (Recommended) ⚡
 
-**Compatible con macOS y Linux (Debian/Ubuntu/Fedora/Arch/Raspberry Pi)**
+**Compatible with macOS and Linux (Debian/Ubuntu/Fedora/Arch/Raspberry Pi)**
 
-1. **Clonar el repositorio**
+1. **Clone the repository**
 ```bash
 mkdir -p ~/dev
 cd ~/dev
@@ -127,63 +127,63 @@ git clone https://github.com/sebasusnik/dotfiles.git
 cd dotfiles
 ```
 
-2. **Ejecutar el script de instalación**
+2. **Run the installation script**
 ```bash
-chmod +x install.sh  # Solo la primera vez
+chmod +x install.sh  # Only the first time
 ./install.sh
 ```
 
-El script automáticamente:
-- 🔍 Detecta tu sistema operativo (macOS/Linux)
-- 📦 Ofrece instalar dependencias faltantes (macOS con Homebrew, Linux con apt/dnf/pacman)
-- 🍺 Instala Homebrew en macOS si no está presente
-- 🎨 Ofrece instalar dependencias opcionales (oh-my-posh, ghostty)
-- 🔧 Configura Git con tus credenciales (personal y trabajo)
-- ✅ Hace backup de tus configuraciones actuales
-- ✅ Crea todos los symlinks necesarios
-- ✅ Verifica dependencias instaladas
-- ✅ Ofrece instalar plugins de Neovim
-- 🤖 Ofrece migrar Claude Code a instalación local
+The script automatically:
+- 🔍 Detects your operating system (macOS/Linux)
+- 📦 Offers to install missing dependencies (macOS with Homebrew, Linux with apt/dnf/pacman)
+- 🍺 Installs Homebrew on macOS if not present
+- 🎨 Offers to install optional dependencies (oh-my-posh, ghostty)
+- 🔧 Configures Git with your credentials (personal and work)
+- ✅ Backs up your current configurations
+- ✅ Creates all necessary symlinks
+- ✅ Verifies installed dependencies
+- ✅ Offers to install Neovim plugins
+- 🤖 Offers to migrate Claude Code to local installation
 
-3. **Configurar Git** (durante la instalación)
+3. **Configure Git** (during installation)
 
-El script te preguntará:
-- Tu nombre completo
-- Tu email personal
-- Si tienes proyectos de trabajo con email diferente
-- Si es así, tu email de trabajo y la ruta de tus proyectos (ej: `~/work/`)
+The script will ask you:
+- Your full name
+- Your personal email
+- If you have work projects with a different email
+- If so, your work email and the path to your projects (e.g., `~/work/`)
 
-Esto configurará Git para usar automáticamente el email correcto según el directorio.
+This will configure Git to automatically use the correct email based on the directory.
 
-4. **Reiniciar tu terminal**
+4. **Restart your terminal**
 ```bash
-# O ejecutar:
+# Or run:
 source ~/.zshrc
 ```
 
-5. **Instalar TypeScript globalmente** (si no lo hiciste antes)
+5. **Install TypeScript globally** (if you didn't before)
 ```bash
 npm install -g typescript
 ```
 
-6. **Migrar Claude Code a instalación local** (recomendado)
+6. **Migrate Claude Code to local installation** (recommended)
 ```bash
-# Esto evita problemas de permisos y facilita actualizaciones
+# This avoids permission issues and facilitates updates
 sudo claude migrate-installer
 
-# El script ya agregó el alias necesario a ~/.zshrc
-# Verifica que funcione:
+# The script already added the necessary alias to ~/.zshrc
+# Verify it works:
 claude --version
 ```
 
 ---
 
-### Opción 2: Instalación Manual 🔧
+### Option 2: Manual Installation 🔧
 
 <details>
-<summary>Click para ver pasos manuales</summary>
+<summary>Click to see manual steps</summary>
 
-#### 1. Clonar el repositorio
+#### 1. Clone the repository
 
 ```bash
 cd ~/dev
@@ -191,7 +191,7 @@ git clone https://github.com/sebasusnik/dotfiles.git
 cd dotfiles
 ```
 
-#### 2. Hacer backup de tu configuración actual (opcional pero recomendado)
+#### 2. Backup your current configuration (optional but recommended)
 
 ```bash
 mv ~/.config/nvim ~/.config/nvim.backup
@@ -200,38 +200,38 @@ mv ~/.zshrc ~/.zshrc.backup
 mv ~/.config/ohmyposh ~/.config/ohmyposh.backup
 ```
 
-#### 3. Crear symlinks
+#### 3. Create symlinks
 
 ```bash
 # Neovim
 ln -sf ~/dev/dotfiles/nvim ~/.config/nvim
 
 # Tmux
-ln -sf ~/dev/dotfiles/.tmux.conf ~/.tmux.conf
+ln -sf ~/dev/dotfiles/tmux/.tmux.conf ~/.tmux.conf
 
 # Zsh
-ln -sf ~/dev/dotfiles/.zshrc ~/.zshrc
+ln -sf ~/dev/dotfiles/shell/.zshrc ~/.zshrc
 
 # Oh My Posh
 ln -sf ~/dev/dotfiles/ohmyposh ~/.config/ohmyposh
 ```
 
-#### 4. Instalar plugins de Neovim
+#### 4. Install Neovim plugins
 
 ```bash
 nvim
-# Lazy.nvim instalará automáticamente todos los plugins al abrir Neovim
-# Espera a que termine y luego ejecuta:
+# Lazy.nvim will automatically install all plugins when opening Neovim
+# Wait for it to finish and then run:
 # :checkhealth
 ```
 
-#### 5. Recargar Zsh
+#### 5. Reload Zsh
 
 ```bash
 source ~/.zshrc
 ```
 
-#### 6. Instalar TypeScript globalmente (para LSP)
+#### 6. Install TypeScript globally (for LSP)
 
 ```bash
 npm install -g typescript
@@ -239,146 +239,146 @@ npm install -g typescript
 
 </details>
 
-## ⌨️ Keybindings Principales
+## ⌨️ Main Keybindings
 
 ### Neovim
 
 #### General
 - `<Space>` - Leader key
-- `<Space>w` - Guardar
-- `<Space>q` - Salir
-- `<Space>x` - Guardar y salir
+- `<Space>w` - Save
+- `<Space>q` - Quit
+- `<Space>x` - Save and quit
 
-#### Navegación
-- `<Space>e` - Toggle Neo-tree (git colors nativos)
-- `-` - Navegar al directorio padre en Neo-tree
-- `<Space>f` - Buscar archivos (Telescope)
-- `<Space>g` - Buscar texto (Telescope live grep)
-- `<Space>/` - Buscar en archivo actual (Telescope)
-- `<Space>b` - Buscar buffers abiertos (Telescope)
+#### Navigation
+- `<Space>e` - Toggle Neo-tree (native git colors)
+- `-` - Navigate to parent directory in Neo-tree
+- `<Space>f` - Find files (Telescope)
+- `<Space>g` - Search text (Telescope live grep)
+- `<Space>/` - Search in current file (Telescope)
+- `<Space>b` - Search open buffers (Telescope)
 
 #### Neo-tree
-- `hjkl` - Navegar por el árbol
-- `Enter` o `l` - Abrir archivo/expandir carpeta
-- `-` - Subir al directorio padre
-- `h` - Cerrar carpeta
-- `q` - Cerrar Neo-tree
+- `hjkl` - Navigate through the tree
+- `Enter` or `l` - Open file/expand folder
+- `-` - Go up to parent directory
+- `h` - Close folder
+- `q` - Close Neo-tree
 
-#### LSP (en archivos TS/JS)
+#### LSP (in TS/JS files)
 - `gd` - Go to definition
 - `K` - Hover documentation
 - `<Space>rn` - Rename
 - `<Space>ca` - Code actions
-- `Ctrl+o` - Volver atrás (después de gd)
+- `Ctrl+o` - Go back (after gd)
 
 #### Splits
-- `Ctrl+h/j/k/l` - Navegar entre splits
+- `Ctrl+h/j/k/l` - Navigate between splits
 
 ### Tmux
 
 #### Prefix: `Ctrl+A`
 
-#### Paneles
-- `Ctrl+A |` - Split vertical
-- `Ctrl+A -` - Split horizontal
-- `Ctrl+H/J/K/L` - Navegar entre paneles (sin prefix!)
-- `Ctrl+A x` - Cerrar panel
-- `Alt+←/→/↑/↓` - Redimensionar paneles
+#### Panes
+- `Ctrl+A |` - Vertical split
+- `Ctrl+A -` - Horizontal split
+- `Ctrl+H/J/K/L` - Navigate between panes (no prefix!)
+- `Ctrl+A x` - Close pane
+- `Alt+←/→/↑/↓` - Resize panes
 
-#### Otras
-- `Ctrl+A r` - Recargar configuración
-- `Ctrl+D` - Cerrar shell/panel (alternativa)
+#### Other
+- `Ctrl+A r` - Reload configuration
+- `Ctrl+D` - Close shell/pane (alternative)
 
-## 🎨 Personalización
+## 🎨 Customization
 
-### Cambiar tema de Oh My Posh
+### Change Oh My Posh theme
 
-Edita `~/.zshrc` y cambia la línea:
+Edit `~/.zshrc` and change the line:
 ```bash
 eval "$(oh-my-posh init zsh --config ~/.config/ohmyposh/config.json)"
 ```
 
-Puedes elegir otros temas de: https://ohmyposh.dev/docs/themes
+You can choose other themes from: https://ohmyposh.dev/docs/themes
 
-### Agregar más plugins a Neovim
+### Add more plugins to Neovim
 
-Edita `~/.config/nvim/init.lua` en la sección de plugins:
+Edit `~/.config/nvim/init.lua` in the plugins section:
 ```lua
 require("lazy").setup({
-    -- Agrega tus plugins aquí
-    { "usuario/plugin" },
+    -- Add your plugins here
+    { "user/plugin" },
 })
 ```
 
 ## 🔧 Troubleshooting
 
-### Neovim: LSP de TypeScript no inicia
+### Neovim: TypeScript LSP doesn't start
 
 ```bash
-# Verificar que TypeScript esté instalado
+# Verify TypeScript is installed
 which tsserver
 
-# Si no está, instalar:
+# If not, install:
 npm install -g typescript
 
-# Luego reiniciar Neovim
+# Then restart Neovim
 ```
 
-### Tmux: Los colores no se ven bien
+### Tmux: Colors don't look right
 
-Agrega a tu `~/.zshrc`:
+Add to your `~/.zshrc`:
 ```bash
 export TERM=xterm-256color
 ```
 
-### Nerd Fonts no se ven
+### Nerd Fonts don't display
 
-Asegúrate de que tu terminal esté usando una Nerd Font:
-- Ghostty: Edita `~/.config/ghostty/config`
+Make sure your terminal is using a Nerd Font:
+- Ghostty: Edit `~/.config/ghostty/config`
 - iTerm2: Preferences → Profiles → Text → Font
 
 ### Claude Code: "command not found"
 
-Si instalaste Claude Code con npm pero no funciona:
+If you installed Claude Code with npm but it doesn't work:
 ```bash
-# Migrar a instalación local (recomendado)
+# Migrate to local installation (recommended)
 sudo claude migrate-installer
 
-# Agregar alias si no existe
+# Add alias if it doesn't exist
 echo 'alias claude="$HOME/.claude/local/claude"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-## 🤖 Dev Workflow con AI
+## 🤖 Dev Workflow with AI
 
-Este setup incluye un comando `dev` que inicia un workspace completo con tmux + nvim + AI tool (Claude Code u OpenCode):
+This setup includes a `dev` command that starts a complete workspace with tmux + nvim + AI tool (Claude Code or OpenCode):
 
-### Uso del comando `dev`
+### Using the `dev` command
 
 ```bash
-# Iniciar con opencode (default)
+# Start with opencode (default)
 dev
 
-# Iniciar con Claude Code
+# Start with Claude Code
 dev claude
-# o
+# or
 dev cc
 
-# Iniciar con opencode explícitamente
+# Start with opencode explicitly
 dev opencode
-# o
+# or
 dev oc
 ```
 
-**Nota:** El comando `dev` está definido en [shell/.zshrc](shell/.zshrc) y es completamente personalizable.
+**Note:** The `dev` command is defined in [shell/.zshrc](shell/.zshrc) and is fully customizable.
 
-### Re-conectar a una sesión existente
+### Reconnect to an existing session
 
 ```bash
-dev-attach  # Útil si cerraste la ventana pero la sesión sigue activa
+dev-attach  # Useful if you closed the window but the session is still active
 ```
 
-### Layout del workspace:
+### Workspace layout:
 ```
 ┌─────────────────────┬──────────────┐
 │                     │              │
@@ -391,70 +391,70 @@ dev-attach  # Útil si cerraste la ventana pero la sesión sigue activa
 └─────────────────────┴──────────────┘
 ```
 
-El comando automáticamente:
-- ✅ Crea o recrea la sesión tmux llamada `dev`
-- ✅ Inicia Neovim en el panel principal
-- ✅ Abre Claude Code u OpenCode en el panel derecho (40% de ancho)
-- ✅ Crea un terminal shell en el panel inferior (30% de alto)
+The command automatically:
+- ✅ Creates or recreates the tmux session named `dev`
+- ✅ Starts Neovim in the main pane
+- ✅ Opens Claude Code or OpenCode in the right pane (40% width)
+- ✅ Creates a shell terminal in the bottom pane (30% height)
 
-### Enviar código al AI desde Neovim:
+### Send code to AI from Neovim:
 
-Ver [KEYBINDINGS.md](KEYBINDINGS.md) para todos los shortcuts, pero los más útiles:
-- `<Space>ac` - Enviar selección visual al AI
-- `<Space>af` - Enviar función actual al AI
-- `<Space>aa` - Enviar archivo completo al AI
-- `<Space>ad` - Enviar git diff al AI
+See [docs/KEYBINDINGS.md](docs/KEYBINDINGS.md) for all shortcuts, but the most useful:
+- `<Space>ac` - Send visual selection to AI
+- `<Space>af` - Send current function to AI
+- `<Space>aa` - Send entire file to AI
+- `<Space>ad` - Send git diff to AI
 
 ### Tmux copy mode:
 
-Copiar texto desde tmux al clipboard (ver [KEYBINDINGS.md](KEYBINDINGS.md)):
+Copy text from tmux to clipboard (see [docs/KEYBINDINGS.md](docs/KEYBINDINGS.md)):
 ```
-1. Ctrl+a [     → Entrar en copy mode
-2. hjkl         → Navegar
-3. v            → Iniciar selección
-4. hjkl         → Seleccionar
-5. y o Enter    → Copiar al clipboard
-6. Cmd+V        → Pegar en cualquier app
+1. Ctrl+a [     → Enter copy mode
+2. hjkl         → Navigate
+3. v            → Start selection
+4. hjkl         → Select
+5. y or Enter   → Copy to clipboard
+6. Cmd+V        → Paste in any app
 ```
 
-## 📚 Estructura del Proyecto
+## 📚 Project Structure
 
 ```
 dotfiles/
-├── nvim/                 # Configuración de Neovim
-│   ├── init.lua         # Archivo principal
+├── nvim/                 # Neovim configuration
+│   ├── init.lua         # Main file
 │   └── lua/
-│       └── config/      # Configuraciones modulares
-├── ohmyposh/            # Configuración de Oh My Posh
-├── git/                 # Configuración de Git
+│       └── config/      # Modular configurations
+├── ohmyposh/            # Oh My Posh configuration
+├── git/                 # Git configuration
 │   └── .gitconfig
-├── shell/               # Configuración de shell
+├── shell/               # Shell configuration
 │   └── .zshrc
-├── tmux/                # Configuración de Tmux
+├── tmux/                # Tmux configuration
 │   └── .tmux.conf
-├── terminal/            # Configuración de terminal
+├── terminal/            # Terminal configuration
 │   └── ghostty.conf
-├── docs/                # Documentación adicional
+├── docs/                # Additional documentation
 │   └── KEYBINDINGS.md
-├── install.sh           # Script de instalación
-├── .gitignore           # Archivos ignorados por git
-└── README.md            # Este archivo
+├── install.sh           # Installation script
+├── .gitignore           # Files ignored by git
+└── README.md            # This file
 ```
 
-## 🤝 Contribuir
+## 🤝 Contributing
 
-Si encuentras mejoras o bugs, siéntete libre de:
-1. Fork el repo
-2. Crear una branch (`git checkout -b feature/mejora`)
-3. Commit tus cambios (`git commit -m 'Add mejora'`)
-4. Push a la branch (`git push origin feature/mejora`)
-5. Abrir un Pull Request
+If you find improvements or bugs, feel free to:
+1. Fork the repo
+2. Create a branch (`git checkout -b feature/improvement`)
+3. Commit your changes (`git commit -m 'Add improvement'`)
+4. Push to the branch (`git push origin feature/improvement`)
+5. Open a Pull Request
 
-## 📝 Licencia
+## 📝 License
 
-MIT License - siéntete libre de usar y modificar como quieras.
+MIT License - feel free to use and modify as you wish.
 
-## 🙏 Créditos
+## 🙏 Credits
 
 - [Neovim](https://neovim.io/)
 - [Lazy.nvim](https://github.com/folke/lazy.nvim)
@@ -463,4 +463,4 @@ MIT License - siéntete libre de usar y modificar como quieras.
 
 ---
 
-**Hecho con ❤️ para un workflow zen y productivo**
+**Made with ❤️ for a zen and productive workflow**
