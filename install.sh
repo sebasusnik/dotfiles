@@ -56,35 +56,63 @@ create_symlink() {
 }
 
 # ============================================
-# Instalar dependencias (solo Linux)
+# Instalar dependencias
 # ============================================
-if [ "$OS" = "linux" ]; then
-    echo "📦 Detectando dependencias faltantes..."
-    echo ""
+echo "📦 Detectando dependencias faltantes..."
+echo ""
 
-    # Lista de dependencias a verificar
-    DEPS_TO_CHECK=("nvim:neovim" "tmux:tmux" "rg:ripgrep" "node:nodejs" "npm:npm" "git:git" "curl:curl")
-    MISSING_DEPS=()
+# Lista de dependencias a verificar
+DEPS_TO_CHECK=("nvim:neovim" "tmux:tmux" "rg:ripgrep" "node:node" "git:git")
+MISSING_DEPS=()
 
-    for dep in "${DEPS_TO_CHECK[@]}"; do
+for dep in "${DEPS_TO_CHECK[@]}"; do
+    CMD="${dep%%:*}"
+    PKG="${dep##*:}"
+    if ! command -v "$CMD" &> /dev/null; then
+        MISSING_DEPS+=("$PKG")
+        echo -e "${YELLOW}✗${NC} $CMD no encontrado"
+    else
+        echo -e "${GREEN}✓${NC} $CMD ya instalado"
+    fi
+done
+
+# Verificar dependencias opcionales de macOS
+if [ "$OS" = "macos" ]; then
+    OPTIONAL_DEPS=("oh-my-posh:oh-my-posh" "ghostty:ghostty")
+    MISSING_OPTIONAL=()
+
+    for dep in "${OPTIONAL_DEPS[@]}"; do
         CMD="${dep%%:*}"
         PKG="${dep##*:}"
         if ! command -v "$CMD" &> /dev/null; then
-            MISSING_DEPS+=("$PKG")
-            echo -e "${YELLOW}✗${NC} $CMD no encontrado"
+            MISSING_OPTIONAL+=("$PKG")
+            echo -e "${YELLOW}✗${NC} $CMD no encontrado (opcional)"
         else
             echo -e "${GREEN}✓${NC} $CMD ya instalado"
         fi
     done
+fi
 
-    # Si hay dependencias faltantes, instalar
-    if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
-        echo ""
-        echo -e "${BLUE}ℹ️  Dependencias faltantes: ${MISSING_DEPS[*]}${NC}"
-        echo ""
-        read -p "¿Instalar dependencias faltantes? (y/n) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
+# Si hay dependencias faltantes, instalar
+if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
+    echo ""
+    echo -e "${BLUE}ℹ️  Dependencias faltantes: ${MISSING_DEPS[*]}${NC}"
+    echo ""
+    read -p "¿Instalar dependencias faltantes? (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        if [ "$OS" = "macos" ]; then
+            # Verificar si Homebrew está instalado
+            if ! command -v brew &> /dev/null; then
+                echo -e "${YELLOW}⚠️  Homebrew no está instalado${NC}"
+                echo "Instalando Homebrew..."
+                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            fi
+
+            echo "📥 Instalando con Homebrew..."
+            brew install "${MISSING_DEPS[@]}"
+            echo -e "${GREEN}✓${NC} Dependencias instaladas"
+        elif [ "$OS" = "linux" ]; then
             if command -v apt &> /dev/null; then
                 echo "📥 Instalando con apt..."
                 sudo apt update
@@ -103,11 +131,30 @@ if [ "$OS" = "linux" ]; then
                 echo "Instala manualmente: ${MISSING_DEPS[*]}"
             fi
         fi
-    else
-        echo -e "${GREEN}✓${NC} Todas las dependencias ya están instaladas"
     fi
-    echo ""
+else
+    echo -e "${GREEN}✓${NC} Todas las dependencias ya están instaladas"
 fi
+
+# Instalar dependencias opcionales de macOS
+if [ "$OS" = "macos" ] && [ ${#MISSING_OPTIONAL[@]} -gt 0 ]; then
+    echo ""
+    echo -e "${BLUE}ℹ️  Dependencias opcionales faltantes: ${MISSING_OPTIONAL[*]}${NC}"
+    read -p "¿Instalar dependencias opcionales? (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "📥 Instalando con Homebrew..."
+        for pkg in "${MISSING_OPTIONAL[@]}"; do
+            if [ "$pkg" = "oh-my-posh" ]; then
+                brew install jandedobbeleer/oh-my-posh/oh-my-posh
+            else
+                brew install --cask "$pkg" 2>/dev/null || brew install "$pkg"
+            fi
+        done
+        echo -e "${GREEN}✓${NC} Dependencias opcionales instaladas"
+    fi
+fi
+echo ""
 
 # ============================================
 # Crear directorios necesarios
