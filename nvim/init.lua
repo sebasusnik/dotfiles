@@ -296,6 +296,77 @@ require("lazy").setup({
             scope_incremental = "<TAB>",
             },
         },
+        -- ============================================
+        -- TEXTOBJECTS: Selección y navegación
+        -- ============================================
+        textobjects = {
+            select = {
+            enable = true,
+            lookahead = true,
+            -- Definir modos de selección (v=charwise, V=linewise)
+            selection_modes = {
+                ['@parameter.outer'] = 'v', -- charwise
+                ['@function.outer'] = 'V',  -- linewise
+                ['@class.outer'] = 'V',     -- linewise
+                ['@conditional.outer'] = 'V',
+                ['@loop.outer'] = 'V',
+                ['@block.outer'] = 'V',
+                ['@comment.outer'] = 'V',
+            },
+            keymaps = {
+                ["af"] = "@function.outer",
+                ["if"] = "@function.inner",
+                ["ac"] = "@class.outer",
+                ["ic"] = "@class.inner",
+                ["aa"] = "@parameter.outer",
+                ["ia"] = "@parameter.inner",
+                ["ai"] = "@conditional.outer",
+                ["ii"] = "@conditional.inner",
+                ["al"] = "@loop.outer",
+                ["il"] = "@loop.inner",
+                ["ab"] = "@block.outer",
+                ["ib"] = "@block.inner",
+                ["a/"] = "@comment.outer",
+            },
+            },
+            move = {
+            enable = true,
+            set_jumps = true,
+            goto_next_start = {
+                ["]m"] = "@function.outer",
+                ["]c"] = "@class.outer",
+                ["]a"] = "@parameter.outer",
+                ["]i"] = "@conditional.outer",
+                ["]l"] = "@loop.outer",
+                ["]b"] = "@block.outer",
+            },
+            goto_next_end = {
+                ["]M"] = "@function.outer",
+                ["]C"] = "@class.outer",
+            },
+            goto_previous_start = {
+                ["[m"] = "@function.outer",
+                ["[c"] = "@class.outer",
+                ["[a"] = "@parameter.outer",
+                ["[i"] = "@conditional.outer",
+                ["[l"] = "@loop.outer",
+                ["[b"] = "@block.outer",
+            },
+            goto_previous_end = {
+                ["[M"] = "@function.outer",
+                ["[C"] = "@class.outer",
+            },
+            },
+            swap = {
+            enable = true,
+            swap_next = {
+                ["<leader>sn"] = "@parameter.inner",
+            },
+            swap_previous = {
+                ["<leader>sp"] = "@parameter.inner",
+            },
+            },
+        },
         })
     end,
     },
@@ -333,6 +404,10 @@ require("config.gitsigns")
 require("config.zen")
 
 -- ============================================
--- 7) OPENCODE
+-- 6.5) TEXTOBJECTS (después de que plugins estén cargados)
 -- ============================================
-require("config.opencode")
+
+-- ============================================
+-- 7) AI INTEGRATION (OpenCode + Claude Code)
+-- ============================================
+require("config.ia")
