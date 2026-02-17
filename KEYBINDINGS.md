@@ -53,18 +53,20 @@ Dentro de Telescope:
 ```
 <leader>ac      Enviar selección visual
 <leader>aa      Enviar archivo completo
-<leader>af      Enviar función donde está el cursor
-<leader>at      Enviar type/interface donde está el cursor
+<leader>af      Enviar función/type/enum donde está el cursor ⭐
+<leader>at      Enviar type/interface donde está el cursor (obsoleto, usa af)
 <leader>al      Enviar líneas específicas (te pregunta rango)
 <leader>ad      Enviar git diff del archivo
 <leader>ao      Enviar estructura del proyecto
 ```
 
+**Nota:** `<leader>af` ahora es inteligente - detecta automáticamente si estás en una función, type, interface o enum!
+
 ## 🎯 Textobjects (Treesitter)
 
 ### Selección
 ```
-vaf / vif       Seleccionar función (outer/inner)
+vaf / vif       Seleccionar función/type/enum/interface (outer/inner) ⭐
 vac / vic       Seleccionar clase (outer/inner)
 vaa / via       Seleccionar parámetro (outer/inner)
 vai / vii       Seleccionar condicional (outer/inner)
@@ -73,16 +75,24 @@ vab / vib       Seleccionar bloque (outer/inner)
 va/             Seleccionar comentario
 ```
 
-### Navegación entre estructuras
+**Nota:** `vaf` es inteligente - funciona tanto para funciones como para types, interfaces y enums en TypeScript!
+
+### Navegación entre funciones (Modo Sticky 🔥)
 ```
-]m / [m         Siguiente/anterior función (inicio)
-]M / [M         Siguiente/anterior función (final)
-]c / [c         Siguiente/anterior clase (inicio)
-]C / [C         Siguiente/anterior clase (final)
-]a / [a         Siguiente/anterior parámetro
-]i / [i         Siguiente/anterior condicional
+<leader>n + ] / [   Navegar funciones (mantener Space+n, presionar ] o [)
+<Esc>               Salir del modo sticky
+```
+
+**Modo Sticky 🔥:** Presiona `Space + n` una vez, luego `]` o `[` repetidamente para navegar adelante/atrás!
+
+### Navegación estándar (sin sticky)
+```
+]m / [m         Siguiente/anterior función
+]c / [c         Siguiente/anterior clase
 ]l / [l         Siguiente/anterior loop
+]i / [i         Siguiente/anterior condicional
 ]b / [b         Siguiente/anterior bloque
+]a / [a         Siguiente/anterior parámetro
 ```
 
 ### Swap (Intercambiar)
@@ -296,6 +306,24 @@ V               Visual línea
 J               Unir líneas
 >               Indentar
 <               Des-indentar
+```
+
+### Mover líneas (<leader>m + j/k - Modo Sticky)
+```
+<leader>m       Entrar en modo "mover" (sticky)
+j               Mover línea/selección abajo (repetir sin Space)
+k               Mover línea/selección arriba (repetir sin Space)
+<Esc>           Salir del modo sticky
+```
+
+**Nota:** Modo "sticky" = presionas `Space + m` una vez, luego solo `j j j` o `k k k` repetidamente.
+
+**Workflow:**
+```
+1. vaf           Seleccionar función
+2. <leader>m     Entrar en modo mover
+3. j j j j       Mover abajo varias veces (sin presionar Space)
+4. <Esc>         Salir de modo sticky + modo visual
 ```
 
 ## 📋 Tips
