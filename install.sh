@@ -173,22 +173,22 @@ echo ""
 create_symlink "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
 
 # Tmux
-create_symlink "$DOTFILES_DIR/.tmux.conf" "$HOME/.tmux.conf"
+create_symlink "$DOTFILES_DIR/tmux/.tmux.conf" "$HOME/.tmux.conf"
 
 # Zsh
-create_symlink "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
+create_symlink "$DOTFILES_DIR/shell/.zshrc" "$HOME/.zshrc"
 
 # Oh My Posh
 create_symlink "$DOTFILES_DIR/ohmyposh" "$HOME/.config/ohmyposh"
 
-# Ghostty (solo macOS por ahora)
+# Ghostty
 if [ "$OS" = "macos" ]; then
     mkdir -p "$HOME/Library/Application Support/com.mitchellh.ghostty"
-    create_symlink "$DOTFILES_DIR/ghostty.conf" "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
+    create_symlink "$DOTFILES_DIR/terminal/ghostty.conf" "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
 elif [ "$OS" = "linux" ]; then
     # En Linux, Ghostty usa XDG_CONFIG_HOME
     mkdir -p "$HOME/.config/ghostty"
-    create_symlink "$DOTFILES_DIR/ghostty.conf" "$HOME/.config/ghostty/config"
+    create_symlink "$DOTFILES_DIR/terminal/ghostty.conf" "$HOME/.config/ghostty/config"
 fi
 
 # ============================================
@@ -199,7 +199,7 @@ echo "🔧 Configurando Git..."
 echo ""
 
 # Symlink para .gitconfig
-create_symlink "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
+create_symlink "$DOTFILES_DIR/git/.gitconfig" "$HOME/.gitconfig"
 
 # Configurar credenciales de git
 if [ -f "$HOME/.gitconfig-local" ]; then

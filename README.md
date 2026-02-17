@@ -408,9 +408,18 @@ dotfiles/
 │   ├── init.lua         # Archivo principal
 │   └── lua/
 │       └── config/      # Configuraciones modulares
-├── ohmyposh/            # Oh My Posh config
-├── .tmux.conf           # Configuración de Tmux
-├── .zshrc               # Configuración de Zsh
+├── ohmyposh/            # Configuración de Oh My Posh
+├── git/                 # Configuración de Git
+│   └── .gitconfig
+├── shell/               # Configuración de shell
+│   └── .zshrc
+├── tmux/                # Configuración de Tmux
+│   └── .tmux.conf
+├── terminal/            # Configuración de terminal
+│   └── ghostty.conf
+├── docs/                # Documentación adicional
+│   └── KEYBINDINGS.md
+├── install.sh           # Script de instalación
 ├── .gitignore           # Archivos ignorados por git
 └── README.md            # Este archivo
 ```
