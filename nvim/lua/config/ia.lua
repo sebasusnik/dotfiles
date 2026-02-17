@@ -262,7 +262,6 @@ vim.keymap.set("n", "<leader>af", function()
 
     -- Seleccionar visualmente para que veas qué se envió
     select_node_range(node)
-    vim.cmd("normal! gv")
     return
   end
 
@@ -288,7 +287,6 @@ vim.keymap.set("n", "<leader>at", function()
 
     -- Seleccionar visualmente para que veas qué se envió
     select_node_range(node)
-    vim.cmd("normal! gv")
     return
   end
 
