@@ -15,8 +15,12 @@ local function get_function_node_at_cursor(bufnr)
   local ok_ft = (ft == "typescript" or ft == "typescriptreact" or ft == "javascript" or ft == "javascriptreact")
   if not ok_ft then return nil end
 
-  local ok_parser = pcall(vim.treesitter.get_parser, bufnr)
-  if not ok_parser then return nil end
+  -- FORZAR inicialización de treesitter
+  local ok_parser, parser = pcall(vim.treesitter.get_parser, bufnr)
+  if not ok_parser or not parser then return nil end
+
+  -- Forzar parse
+  pcall(function() parser:parse() end)
 
   local node = vim.treesitter.get_node({ bufnr = bufnr })
   if not node then return nil end
@@ -24,6 +28,7 @@ local function get_function_node_at_cursor(bufnr)
   -- Subimos por los parents buscando algo que "sea una función"
   while node do
     local t = node:type()
+    local found_node = nil
 
     -- Casos directos
     if t == "function_declaration"
@@ -31,16 +36,44 @@ local function get_function_node_at_cursor(bufnr)
       or t == "function_expression"
       or t == "arrow_function"
     then
-      return node
+      found_node = node
     end
 
-    -- Caso: const foo = () => {}  (variable_declarator)
+    -- Caso: const foo = () => {}  (variable_declarator con función)
     if t == "variable_declarator" then
       for child in node:iter_children() do
         local ct = child:type()
         if ct == "arrow_function" or ct == "function_expression" then
-          return node -- devolvemos el declarator para incluir el "const foo ="
+          found_node = node
+          break
         end
+      end
+    end
+
+    -- Caso: lexical_declaration (const/let) o variable_declaration (var)
+    if t == "lexical_declaration" or t == "variable_declaration" then
+      -- Buscar si contiene una función
+      for child in node:iter_children() do
+        if child:type() == "variable_declarator" then
+          for grandchild in child:iter_children() do
+            local gct = grandchild:type()
+            if gct == "arrow_function" or gct == "function_expression" then
+              found_node = node
+              break
+            end
+          end
+        end
+        if found_node then break end
+      end
+    end
+
+    -- Si encontramos un nodo válido, verificar si su parent es export_statement
+    if found_node then
+      local parent = found_node:parent()
+      if parent and parent:type() == "export_statement" then
+        return parent  -- Retornar export completo
+      else
+        return found_node
       end
     end
 
@@ -57,19 +90,37 @@ local function get_type_node_at_cursor(bufnr)
   -- Solo para TS
   if not (ft == "typescript" or ft == "typescriptreact") then return nil end
 
-  local ok_parser = pcall(vim.treesitter.get_parser, bufnr)
-  if not ok_parser then return nil end
+  -- FORZAR inicialización de treesitter
+  local ok_parser, parser = pcall(vim.treesitter.get_parser, bufnr)
+  if not ok_parser or not parser then return nil end
+
+  -- Forzar parse
+  pcall(function() parser:parse() end)
 
   local node = vim.treesitter.get_node({ bufnr = bufnr })
   if not node then return nil end
 
   while node do
     local t = node:type()
+    local found_node = nil
 
-    if t == "type_alias_declaration" or
-       t == "interface_declaration" or
-       t == "enum_declaration" then
-      return node
+    -- Types, interfaces, enums, variables - SOLO OUTER nodes
+    if t == "type_alias_declaration"
+       or t == "interface_declaration"
+       or t == "enum_declaration"
+       or t == "lexical_declaration"
+       or t == "variable_declaration" then
+      found_node = node
+    end
+
+    -- Si encontramos un nodo válido, verificar si su parent es export_statement
+    if found_node then
+      local parent = found_node:parent()
+      if parent and parent:type() == "export_statement" then
+        return parent  -- Retornar export completo
+      else
+        return found_node
+      end
     end
 
     node = node:parent()
@@ -80,11 +131,16 @@ end
 
 local function select_node_range(node)
   local srow, scol, erow, ecol = node:range()
-  -- node:range() es 0-indexed, erow es exclusivo
-  -- Para vim (1-indexed): start = srow+1, end = erow (porque exclusivo 0-indexed = inclusivo 1-indexed)
-  vim.api.nvim_win_set_cursor(0, { srow + 1, 0 })
-  vim.cmd("normal! V")
-  vim.api.nvim_win_set_cursor(0, { erow, 0 })
+  -- node:range() devuelve 0-indexed, erow es EXCLUSIVO
+
+  local start_line = srow + 1
+  local end_line = erow + 1  -- Sumar 1 para incluir la última línea
+
+  -- Método oficial de nvim-treesitter-textobjects
+  vim.cmd('normal! V')
+  vim.api.nvim_win_set_cursor(0, {start_line, 0})
+  vim.cmd('normal! o')
+  vim.api.nvim_win_set_cursor(0, {end_line, 0})
 end
 
 -- ============================================
@@ -178,22 +234,29 @@ vim.keymap.set('v', '<leader>ac', function()
   end
 end, { desc = 'Enviar selección a AI' })
 
--- Enviar función completa donde está el cursor (Treesitter)
+-- Enviar función/type/enum donde está el cursor (inteligente)
 vim.keymap.set("n", "<leader>af", function()
   local filepath = get_relative_path()
+
+  -- Intentar encontrar función primero
   local node = get_function_node_at_cursor(0)
+  local node_type = "función"
+
+  -- Si no hay función, intentar type/interface/enum
+  if not node then
+    node = get_type_node_at_cursor(0)
+    node_type = "type/enum"
+  end
 
   if node then
     local srow, _, erow, _ = node:range()
-    -- node:range() es 0-indexed, erow es exclusivo
+    -- node:range() devuelve 0-indexed, erow es EXCLUSIVO
+    -- Para 1-indexed: start = srow + 1, end = erow + 1
     local start_line = srow + 1
-    local end_line = erow  -- erow ya apunta a la línea correcta (exclusivo 0-indexed = inclusivo 1-indexed)
-
-    -- DEBUG: Mostrar qué tipo de nodo detectó
-    print("🐛 DEBUG: Tipo de nodo: " .. node:type() .. " | Líneas: " .. start_line .. "-" .. end_line)
+    local end_line = erow + 1
 
     if send_file_reference(filepath, start_line, end_line) then
-      print("✓ Función enviada: @" .. filepath .. "#L" .. start_line .. "-" .. end_line)
+      print("✓ " .. node_type .. " enviada: @" .. filepath .. "#L" .. start_line .. "-" .. end_line)
       print("💬 Escribe tu pregunta en el AI")
     end
 
@@ -203,20 +266,9 @@ vim.keymap.set("n", "<leader>af", function()
     return
   end
 
-  -- Fallback (si Treesitter no engancha)
-  local pos = vim.fn.getpos(".")
-  vim.cmd("normal! [[")
-  vim.cmd("normal! V][")
-
-  local start_line = vim.fn.line("'<")
-  local end_line = vim.fn.line("'>")
-
-  if send_file_reference(filepath, start_line, end_line) then
-    print("✓ Función enviada (fallback): @" .. filepath .. "#L" .. start_line .. "-" .. end_line)
-    print("💬 Escribe tu pregunta en el AI")
-  end
-  vim.fn.setpos(".", pos)
-end, { desc = "Enviar función a AI" })
+  -- Si no encontró nada con Treesitter, notificar
+  print("⚠️  No se encontró función ni type/enum en el cursor")
+end, { desc = "Enviar función/type a AI" })
 
 -- Enviar type/interface/enum donde está el cursor
 vim.keymap.set("n", "<leader>at", function()
@@ -225,9 +277,9 @@ vim.keymap.set("n", "<leader>at", function()
 
   if node then
     local srow, _, erow, _ = node:range()
-    -- node:range() es 0-indexed, erow es exclusivo
+    -- node:range() es 0-indexed, erow es EXCLUSIVO
     local start_line = srow + 1
-    local end_line = erow  -- erow ya apunta a la línea correcta
+    local end_line = erow + 1  -- Sumar 1 para incluir la última línea
 
     if send_file_reference(filepath, start_line, end_line) then
       print("✓ Type enviado: @" .. filepath .. "#L" .. start_line .. "-" .. end_line)
