@@ -70,54 +70,152 @@ require("lazy").setup({
     -- Navegación / archivos
     -- ======================
     {
-        "echasnovski/mini.files",
+        "nvim-neo-tree/neo-tree.nvim",
+        branch = "v3.x",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "nvim-tree/nvim-web-devicons",
+            "MunifTanjim/nui.nvim",
+        },
         config = function()
-            require("mini.files").setup({
-                windows = { preview = false, width_focus = 30 },
-            })
-
-            vim.keymap.set("n", "<leader>e", function()
-                if not MiniFiles.close() then
-                    MiniFiles.open(vim.api.nvim_buf_get_name(0))
-                end
-            end, { desc = "Toggle file explorer" })
-
-            -- Navegación: Enter para abrir, - para volver atrás
-            vim.api.nvim_create_autocmd("User", {
-                pattern = "MiniFilesBufferCreate",
-                callback = function(args)
-                    local buf_id = args.data.buf_id
-                    vim.keymap.set("n", "<CR>", function()
-                        MiniFiles.go_in()
-                    end, { buffer = buf_id, desc = "Enter directory" })
-                    vim.keymap.set("n", "-", function()
-                        MiniFiles.go_out()
-                    end, { buffer = buf_id, desc = "Go back" })
-                end,
-            })
-        end,
-    },
-
-    {
-        "junegunn/fzf.vim",
-        dependencies = { "junegunn/fzf" },
-        config = function()
-        vim.keymap.set("n", "<leader>f", ":Files<CR>", { desc = "Buscar archivos" })
-        vim.keymap.set("n", "<leader>g", ":Rg<CR>", { desc = "Buscar texto" })
-        vim.keymap.set("n", "<leader>/", ":BLines<CR>", { desc = "Buscar en archivo" })
-        end,
-    },
-
-    {
-        "stevearc/oil.nvim",
-        config = function()
-            require("oil").setup({
-                columns = { "icon" },
-                view_options = {
-                    show_hidden = false,
+            require("neo-tree").setup({
+                close_if_last_window = true,
+                enable_git_status = true,
+                enable_diagnostics = false,
+                popup_border_style = "rounded",
+                window = {
+                    position = "left",
+                    width = 24,
+                    mappings = {
+                        ["<cr>"] = {
+                            function(state)
+                                local node = state.tree:get_node()
+                                if node.type == "directory" then
+                                    require("neo-tree.sources.filesystem.commands").set_root(state)
+                                else
+                                    require("neo-tree.sources.filesystem.commands").open(state)
+                                    require("neo-tree.command").execute({ action = "close" })
+                                end
+                            end,
+                            desc = "Open file or enter directory"
+                        },
+                        ["-"] = "navigate_up",
+                        ["<space>"] = "none",
+                        ["<C-w>"] = "none",
+                    }
+                },
+                filesystem = {
+                    filtered_items = {
+                        hide_dotfiles = false,
+                        hide_gitignored = false,
+                    },
+                    follow_current_file = {
+                        enabled = false,
+                    },
+                    group_empty_dirs = false,
+                    use_libuv_file_watcher = false,
+                },
+                default_component_configs = {
+                    container = {
+                        enable_character_fade = false,
+                    },
+                    indent = {
+                        with_markers = false,
+                        indent_size = 2,
+                        padding = 0,
+                    },
+                    icon = {
+                        folder_closed = "",
+                        folder_open = "",
+                        folder_empty = "",
+                        default = "",
+                    },
+                    modified = {
+                        symbol = "",
+                    },
+                    git_status = {
+                        symbols = {
+                            added     = "",
+                            modified  = "",
+                            deleted   = "",
+                            renamed   = "",
+                            untracked = "",
+                            ignored   = "",
+                            unstaged  = "",
+                            staged    = "",
+                        }
+                    },
+                    name = {
+                        trailing_slash = false,
+                        use_git_status_colors = true,
+                    },
                 },
             })
-            vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Oil explorer" })
+            vim.keymap.set("n", "<leader>e", ":Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
+            vim.keymap.set("n", "-", ":Neotree reveal<CR>", { desc = "Reveal in Neo-tree" })
+            vim.keymap.set("n", "<leader>o", ":Neotree focus<CR>", { desc = "Focus Neo-tree" })
+        end,
+    },
+
+    {
+        "nvim-telescope/telescope.nvim",
+        branch = "master",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        config = function()
+            local builtin = require("telescope.builtin")
+            local actions = require("telescope.actions")
+
+            require("telescope").setup({
+                defaults = {
+                    mappings = {
+                        i = {
+                            ["<esc>"] = actions.close,
+                            ["<C-j>"] = actions.move_selection_next,
+                            ["<C-k>"] = actions.move_selection_previous,
+                        },
+                    },
+                    file_ignore_patterns = {
+                        "node_modules/",
+                        ".git/",
+                        "dist/",
+                        "build/",
+                    },
+                    vimgrep_arguments = {
+                        "rg",
+                        "--color=never",
+                        "--no-heading",
+                        "--with-filename",
+                        "--line-number",
+                        "--column",
+                        "--smart-case",
+                        "--hidden",
+                        "--glob=!.git/",
+                        "--glob=!node_modules/",
+                        "--glob=!dist/",
+                        "--glob=!build/",
+                    },
+                },
+                pickers = {
+                    find_files = {
+                        hidden = true,
+                        previewer = false,
+                    },
+                    live_grep = {
+                        previewer = false,
+                    },
+                    buffers = {
+                        previewer = false,
+                    },
+                    current_buffer_fuzzy_find = {
+                        previewer = false,
+                    },
+                },
+            })
+
+            vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "Buscar archivos" })
+            vim.keymap.set("n", "<leader>g", builtin.live_grep, { desc = "Buscar texto" })
+            vim.keymap.set("n", "<leader>/", builtin.current_buffer_fuzzy_find, { desc = "Buscar en archivo" })
+            vim.keymap.set("n", "<leader>b", builtin.buffers, { desc = "Buscar buffers" })
         end,
     },
 

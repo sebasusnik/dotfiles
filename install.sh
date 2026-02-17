@@ -65,6 +65,10 @@ create_symlink "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"
 # Oh My Posh
 create_symlink "$DOTFILES_DIR/ohmyposh" "$HOME/.config/ohmyposh"
 
+# Ghostty
+mkdir -p "$HOME/Library/Application Support/com.mitchellh.ghostty"
+create_symlink "$DOTFILES_DIR/ghostty.conf" "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
+
 # ============================================
 # Verificar dependencias
 # ============================================
@@ -84,10 +88,10 @@ check_command() {
 
 check_command "nvim"
 check_command "tmux"
-check_command "fzf"
 check_command "rg"
 check_command "node"
 check_command "oh-my-posh"
+check_command "ghostty"
 
 # TypeScript
 if command -v tsserver &> /dev/null; then

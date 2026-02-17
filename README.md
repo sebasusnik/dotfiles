@@ -13,8 +13,8 @@ Configuración minimalista y zen para desarrollo con Neovim, Tmux, y Oh My Posh.
 
 ### Neovim
 - 🎨 LSP configurado para TypeScript/JavaScript (typescript-tools)
-- 🔍 Fuzzy finding con fzf
-- 📁 Exploradores de archivos (mini.files + oil.nvim)
+- 🔍 Fuzzy finding con Telescope
+- 📁 Explorador de archivos con git colors nativos (neo-tree)
 - ✍️ Autocompletado con nvim-cmp
 - 🎯 Treesitter para syntax highlighting
 - 🔧 Formateo con conform.nvim y linting con nvim-lint
@@ -35,7 +35,7 @@ Configuración minimalista y zen para desarrollo con Neovim, Tmux, y Oh My Posh.
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Instalar dependencias
-brew install neovim tmux fzf ripgrep node
+brew install neovim tmux ripgrep node
 brew install --cask font-hack-nerd-font  # O tu Nerd Font favorita
 
 # Instalar Oh My Posh
@@ -149,11 +149,19 @@ npm install -g typescript
 - `<Space>x` - Guardar y salir
 
 #### Navegación
-- `<Space>e` - Toggle file explorer (mini.files)
-- `-` - Oil explorer
-- `<Space>f` - Buscar archivos (fzf)
-- `<Space>g` - Buscar texto (ripgrep)
-- `<Space>/` - Buscar en archivo actual
+- `<Space>e` - Toggle Neo-tree (git colors nativos)
+- `-` - Navegar al directorio padre en Neo-tree
+- `<Space>f` - Buscar archivos (Telescope)
+- `<Space>g` - Buscar texto (Telescope live grep)
+- `<Space>/` - Buscar en archivo actual (Telescope)
+- `<Space>b` - Buscar buffers abiertos (Telescope)
+
+#### Neo-tree
+- `hjkl` - Navegar por el árbol
+- `Enter` o `l` - Abrir archivo/expandir carpeta
+- `-` - Subir al directorio padre
+- `h` - Cerrar carpeta
+- `q` - Cerrar Neo-tree
 
 #### LSP (en archivos TS/JS)
 - `gd` - Go to definition

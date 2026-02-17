@@ -5,7 +5,14 @@
 -- 1) Diagnósticos: limpio, sin ruido inline
 vim.diagnostic.config({
   virtual_text = false,
-  signs = true,
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "󰅚",
+      [vim.diagnostic.severity.WARN]  = "󰀪",
+      [vim.diagnostic.severity.HINT]  = "󰌶",
+      [vim.diagnostic.severity.INFO]  = "󰋽",
+    },
+  },
   underline = true,
   update_in_insert = false,
   severity_sort = true,
@@ -17,18 +24,6 @@ vim.diagnostic.config({
     focusable = false,
   },
 })
-
--- 2) Signs con iconos suaves (requiere Nerd Font)
-local diag_signs = {
-  Error = "󰅚",
-  Warn  = "󰀪",
-  Hint  = "󰌶",
-  Info  = "󰋽",
-}
-for t, icon in pairs(diag_signs) do
-  local hl = "DiagnosticSign" .. t
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-end
 
 -- 3) Bordes rounded para TODO floating preview (esto faltaba)
 do
@@ -73,3 +68,42 @@ end
 
 transparent()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = transparent })
+
+-- 7) Habilitar soporte de undercurl en terminal
+vim.o.termguicolors = true
+
+-- Configurar secuencias de escape para undercurl (crítico para Ghostty)
+vim.cmd([[let &t_Cs = "\e[4:3m"]])
+vim.cmd([[let &t_Ce = "\e[4:0m"]])
+
+-- 8) Configurar underline para diagnósticos (más compatible)
+local function set_diagnostics_hl()
+  vim.api.nvim_set_hl(0, "DiagnosticUnderlineError", {
+    sp = "#ff5f5f",
+    undercurl = true
+  })
+  vim.api.nvim_set_hl(0, "DiagnosticUnderlineWarn", {
+    sp = "#ffaf5f",
+    undercurl = true
+  })
+  vim.api.nvim_set_hl(0, "DiagnosticUnderlineInfo", {
+    sp = "#5fafd7",
+    undercurl = true
+  })
+  vim.api.nvim_set_hl(0, "DiagnosticUnderlineHint", {
+    sp = "#5fd787",
+    undercurl = true
+  })
+  -- TypeScript específicos
+  vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", {
+    sp = "#808080",
+    undercurl = true
+  })
+  vim.api.nvim_set_hl(0, "DiagnosticDeprecated", {
+    sp = "#d75f00",
+    undercurl = true
+  })
+end
+
+set_diagnostics_hl()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = set_diagnostics_hl })
