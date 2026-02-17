@@ -171,9 +171,64 @@ map_textobject(modes, "a/", "@comment.outer")
 local ts_move = require("nvim-treesitter-textobjects.move")
 
 -- Siguiente inicio
-vim.keymap.set("n", "]m", function()
-  ts_move.goto_next_start("@function.outer")
-end, { desc = "Siguiente función" })
+-- Navegación inteligente para ]m (todas las declaraciones)
+local function goto_next_declaration_smart()
+  local ft = vim.bo.filetype
+  local supported_filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" }
+  local is_supported = false
+  for _, supported_ft in ipairs(supported_filetypes) do
+    if ft == supported_ft then is_supported = true; break end
+  end
+  if not is_supported then
+    vim.notify("Navegación inteligente solo disponible en archivos TS/JS", vim.log.levels.INFO)
+    return
+  end
+
+  local valid_node_types = {
+    "function_declaration", "method_definition", "function_expression", "arrow_function",
+    "lexical_declaration", "variable_declaration", "type_alias_declaration",
+    "interface_declaration", "enum_declaration", "class_declaration",
+  }
+
+  local function is_valid_node(node)
+    if not node then return false end
+    local node_type = node:type()
+    for _, valid_type in ipairs(valid_node_types) do
+      if node_type == valid_type then return true end
+    end
+    if node_type == "export_statement" then
+      for child in node:iter_children() do
+        if is_valid_node(child) then return true end
+      end
+    end
+    return false
+  end
+
+  local ok, parser = pcall(vim.treesitter.get_parser, 0)
+  if not ok or not parser then return end
+  local trees = parser:parse()
+  if not trees or #trees == 0 then return end
+
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local current_row = cursor[1] - 1
+  local root = trees[1]:root()
+  local best_node, best_row = nil, math.huge
+
+  local function visit(n)
+    if is_valid_node(n) then
+      local row = n:range()
+      if row > current_row and row < best_row then
+        best_node, best_row = n, row
+      end
+    end
+    for child in n:iter_children() do visit(child) end
+  end
+
+  for node in root:iter_children() do visit(node) end
+  if best_node then vim.api.nvim_win_set_cursor(0, {best_row + 1, 0}) end
+end
+
+vim.keymap.set("n", "]m", goto_next_declaration_smart, { desc = "Siguiente declaración" })
 
 vim.keymap.set("n", "]c", function()
   ts_move.goto_next_start("@class.outer")
@@ -205,9 +260,64 @@ vim.keymap.set("n", "]C", function()
 end, { desc = "Siguiente clase (final)" })
 
 -- Anterior inicio
-vim.keymap.set("n", "[m", function()
-  ts_move.goto_previous_start("@function.outer")
-end, { desc = "Anterior función" })
+-- Navegación inteligente para [m (todas las declaraciones)
+local function goto_prev_declaration_smart()
+  local ft = vim.bo.filetype
+  local supported_filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" }
+  local is_supported = false
+  for _, supported_ft in ipairs(supported_filetypes) do
+    if ft == supported_ft then is_supported = true; break end
+  end
+  if not is_supported then
+    vim.notify("Navegación inteligente solo disponible en archivos TS/JS", vim.log.levels.INFO)
+    return
+  end
+
+  local valid_node_types = {
+    "function_declaration", "method_definition", "function_expression", "arrow_function",
+    "lexical_declaration", "variable_declaration", "type_alias_declaration",
+    "interface_declaration", "enum_declaration", "class_declaration",
+  }
+
+  local function is_valid_node(node)
+    if not node then return false end
+    local node_type = node:type()
+    for _, valid_type in ipairs(valid_node_types) do
+      if node_type == valid_type then return true end
+    end
+    if node_type == "export_statement" then
+      for child in node:iter_children() do
+        if is_valid_node(child) then return true end
+      end
+    end
+    return false
+  end
+
+  local ok, parser = pcall(vim.treesitter.get_parser, 0)
+  if not ok or not parser then return end
+  local trees = parser:parse()
+  if not trees or #trees == 0 then return end
+
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local current_row = cursor[1] - 1
+  local root = trees[1]:root()
+  local best_node, best_row = nil, -1
+
+  local function visit(n)
+    if is_valid_node(n) then
+      local row = n:range()
+      if row < current_row and row > best_row then
+        best_node, best_row = n, row
+      end
+    end
+    for child in n:iter_children() do visit(child) end
+  end
+
+  for node in root:iter_children() do visit(node) end
+  if best_node then vim.api.nvim_win_set_cursor(0, {best_row + 1, 0}) end
+end
+
+vim.keymap.set("n", "[m", goto_prev_declaration_smart, { desc = "Anterior declaración" })
 
 vim.keymap.set("n", "[c", function()
   ts_move.goto_previous_start("@class.outer")

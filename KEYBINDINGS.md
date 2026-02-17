@@ -83,11 +83,11 @@ va/             Seleccionar comentario
 <Esc>               Salir del modo sticky
 ```
 
-**Modo Sticky 🔥:** Presiona `Space + n` una vez, luego `]` o `[` repetidamente para saltar entre cualquier declaración (funciones, types, interfaces, enums, variables)!
+**Modo Sticky 🔥:** Presiona `Space + n` una vez, luego `j` o `k` repetidamente para saltar entre cualquier declaración (funciones, types, interfaces, enums, variables)!
 
 ### Navegación estándar (sin sticky)
 ```
-]m / [m         Siguiente/anterior función
+]m / [m         Siguiente/anterior declaración (funciones, types, variables, etc.)
 ]c / [c         Siguiente/anterior clase
 ]l / [l         Siguiente/anterior loop
 ]i / [i         Siguiente/anterior condicional
