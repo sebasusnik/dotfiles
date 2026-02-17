@@ -36,16 +36,18 @@ Configuración minimalista y zen para desarrollo con Neovim, Tmux, y Oh My Posh.
 
 ## 🛠️ Prerequisitos
 
+> **Nota:** El script de instalación puede manejar la mayoría de estas dependencias automáticamente. Ve directamente a [Instalación](#-instalación) si prefieres que el script lo haga por ti.
+
 ### macOS
 ```bash
-# Instalar Homebrew si no lo tienes
+# Instalar Homebrew si no lo tienes (o deja que el script lo haga)
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Instalar dependencias
+# Instalar dependencias (o deja que el script lo haga)
 brew install neovim tmux ripgrep node
 brew install --cask font-hack-nerd-font  # O tu Nerd Font favorita
 
-# Instalar Oh My Posh
+# Instalar Oh My Posh (o deja que el script lo haga)
 brew install jandedobbeleer/oh-my-posh/oh-my-posh
 
 # Instalar AI tools (opcional pero recomendado)
@@ -54,11 +56,14 @@ npm install -g opencode                   # OpenCode (alternativa)
 ```
 
 ### Linux (Debian/Ubuntu/Raspberry Pi)
+
+> **Nota:** El script de instalación puede instalar estas dependencias automáticamente.
+
 ```bash
 # Actualizar repositorios
 sudo apt update
 
-# Instalar dependencias básicas
+# Instalar dependencias básicas (o deja que el script lo haga)
 sudo apt install -y neovim tmux ripgrep nodejs npm git curl build-essential
 
 # Instalar Ghostty (opcional - terminal moderno)
@@ -117,7 +122,7 @@ npm install -g opencode
 ```bash
 mkdir -p ~/dev
 cd ~/dev
-git clone https://github.com/TU-USUARIO/dotfiles.git
+git clone https://github.com/sebasusnik/dotfiles.git
 cd dotfiles
 ```
 
@@ -129,25 +134,38 @@ chmod +x install.sh  # Solo la primera vez
 
 El script automáticamente:
 - 🔍 Detecta tu sistema operativo (macOS/Linux)
-- 📦 Ofrece instalar dependencias (solo Linux)
+- 📦 Ofrece instalar dependencias faltantes (macOS con Homebrew, Linux con apt/dnf/pacman)
+- 🍺 Instala Homebrew en macOS si no está presente
+- 🎨 Ofrece instalar dependencias opcionales (oh-my-posh, ghostty)
+- 🔧 Configura Git con tus credenciales (personal y trabajo)
 - ✅ Hace backup de tus configuraciones actuales
 - ✅ Crea todos los symlinks necesarios
 - ✅ Verifica dependencias instaladas
 - ✅ Ofrece instalar plugins de Neovim
 - 🤖 Ofrece migrar Claude Code a instalación local
 
-3. **Reiniciar tu terminal**
+3. **Configurar Git** (durante la instalación)
+
+El script te preguntará:
+- Tu nombre completo
+- Tu email personal
+- Si tienes proyectos de trabajo con email diferente
+- Si es así, tu email de trabajo y la ruta de tus proyectos (ej: `~/work/`)
+
+Esto configurará Git para usar automáticamente el email correcto según el directorio.
+
+4. **Reiniciar tu terminal**
 ```bash
 # O ejecutar:
 source ~/.zshrc
 ```
 
-4. **Instalar TypeScript globalmente** (si no lo hiciste antes)
+5. **Instalar TypeScript globalmente** (si no lo hiciste antes)
 ```bash
 npm install -g typescript
 ```
 
-5. **Migrar Claude Code a instalación local** (recomendado)
+6. **Migrar Claude Code a instalación local** (recomendado)
 ```bash
 # Esto evita problemas de permisos y facilita actualizaciones
 sudo claude migrate-installer
@@ -168,7 +186,7 @@ claude --version
 
 ```bash
 cd ~/dev
-git clone https://github.com/TU-USUARIO/dotfiles.git
+git clone https://github.com/sebasusnik/dotfiles.git
 cd dotfiles
 ```
 
