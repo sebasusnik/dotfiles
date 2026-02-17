@@ -1,0 +1,20 @@
+# Neovim
+nvim/lazy-lock.json
+nvim/.luarc.json
+nvim/.DS_Store
+
+# Oh My Posh cache
+ohmyposh/cache/
+
+# MacOS
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Backup files
+*.backup
+*.bak
+
+# Local overrides (no commitear)
+*.local
