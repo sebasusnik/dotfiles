@@ -84,7 +84,7 @@ require("lazy").setup({
                 enable_diagnostics = false,
                 popup_border_style = "rounded",
                 window = {
-                    position = "left",
+                    position = "right",
                     width = 24,
                     mappings = {
                         ["<cr>"] = {
@@ -94,7 +94,6 @@ require("lazy").setup({
                                     require("neo-tree.sources.filesystem.commands").set_root(state)
                                 else
                                     require("neo-tree.sources.filesystem.commands").open(state)
-                                    require("neo-tree.command").execute({ action = "close" })
                                 end
                             end,
                             desc = "Open file or enter directory"
@@ -125,10 +124,10 @@ require("lazy").setup({
                         padding = 0,
                     },
                     icon = {
-                        folder_closed = "",
-                        folder_open = "",
-                        folder_empty = "",
-                        default = "",
+                        folder_closed = "󰉋",
+                        folder_open = "󰝰",
+                        folder_empty = "󰉖",
+                        default = "󰈙",
                     },
                     modified = {
                         symbol = "",
