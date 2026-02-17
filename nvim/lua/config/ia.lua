@@ -161,10 +161,15 @@ end
 -- ============================================
 
 -- Enviar selección visual como referencia de líneas
-vim.keymap.set('v', '<leader>ic', function()
-  -- Las marcas '< y '> se actualizan automáticamente al salir de modo visual
-  local start_line = vim.fn.line("'<")
-  local end_line = vim.fn.line("'>")
+vim.keymap.set('v', '<leader>ac', function()
+  -- Obtener las posiciones de la selección visual actual
+  local start_pos = vim.fn.getpos("v")
+  local end_pos = vim.fn.getpos(".")
+
+  -- Asegurar que start esté antes que end
+  local start_line = math.min(start_pos[2], end_pos[2])
+  local end_line = math.max(start_pos[2], end_pos[2])
+
   local filepath = get_relative_path()
 
   if send_file_reference(filepath, start_line, end_line) then
@@ -174,7 +179,7 @@ vim.keymap.set('v', '<leader>ic', function()
 end, { desc = 'Enviar selección a AI' })
 
 -- Enviar función completa donde está el cursor (Treesitter)
-vim.keymap.set("n", "<leader>if", function()
+vim.keymap.set("n", "<leader>af", function()
   local filepath = get_relative_path()
   local node = get_function_node_at_cursor(0)
 
@@ -214,7 +219,7 @@ vim.keymap.set("n", "<leader>if", function()
 end, { desc = "Enviar función a AI" })
 
 -- Enviar type/interface/enum donde está el cursor
-vim.keymap.set("n", "<leader>it", function()
+vim.keymap.set("n", "<leader>at", function()
   local filepath = get_relative_path()
   local node = get_type_node_at_cursor(0)
 
@@ -239,7 +244,7 @@ vim.keymap.set("n", "<leader>it", function()
 end, { desc = "Enviar type/interface a AI" })
 
 -- Enviar líneas específicas (pregunta rango)
-vim.keymap.set('n', '<leader>il', function()
+vim.keymap.set('n', '<leader>al', function()
   local filepath = get_relative_path()
   local current = vim.fn.line('.')
 
@@ -261,7 +266,7 @@ vim.keymap.set('n', '<leader>il', function()
 end, { desc = 'Enviar líneas a AI' })
 
 -- Enviar archivo completo
-vim.keymap.set('n', '<leader>ia', function()
+vim.keymap.set('n', '<leader>aa', function()
   local filepath = get_relative_path()
   local lines = vim.fn.getline(1, '$')
 
@@ -271,58 +276,13 @@ vim.keymap.set('n', '<leader>ia', function()
   end
 end, { desc = 'Enviar archivo a AI' })
 
--- Iniciar selección visual línea
-vim.keymap.set('n', '<leader>v', 'V', { desc = 'Selección línea' })
-
--- Seleccionar type/interface/enum visualmente
-vim.keymap.set("n", "<leader>vt", function()
-  local node = get_type_node_at_cursor(0)
-  if node then
-    select_node_range(node)
-    print("📍 Type/Interface seleccionado")
-    return
-  end
-
-  print("⚠️  No hay type/interface/enum en el cursor")
-end, { desc = "Seleccionar type/interface" })
-
--- Seleccionar función visualmente (para ver antes de copiar)
-vim.keymap.set("n", "<leader>vf", function()
-  local node = get_function_node_at_cursor(0)
-  if node then
-    select_node_range(node)
-    print("📍 Función seleccionada - presiona 'y' para copiar")
-    return
-  end
-
-  vim.cmd("normal! [[V][")
-  print("📍 Función seleccionada (fallback)")
-end, { desc = "Seleccionar función" })
-
 -- Buscar palabra bajo cursor en proyecto
 vim.keymap.set('n', '<leader>*', function()
   require('telescope.builtin').grep_string()
 end, { desc = 'Buscar palabra' })
 
--- Guardar archivo antes de enviar contexto al AI
-vim.keymap.set('n', '<leader>is', function()
-  vim.cmd('w')
-  print("✓ Guardado. Usa <leader>ia para enviar este archivo al AI")
-end, { desc = 'Guardar archivo' })
-
--- Enviar archivo completo (alias de <leader>ia)
-vim.keymap.set('n', '<leader>ix', function()
-  local filepath = get_relative_path()
-  local lines = vim.fn.getline(1, '$')
-
-  if send_file_reference(filepath, nil, nil) then
-    print("✓ Archivo enviado: @" .. filepath .. " (" .. #lines .. " líneas)")
-    print("💬 Escribe tu pregunta en el AI")
-  end
-end, { desc = 'Enviar archivo completo a AI' })
-
 -- Enviar cambios git del archivo actual
-vim.keymap.set('n', '<leader>id', function()
+vim.keymap.set('n', '<leader>ad', function()
   local file = vim.fn.expand('%')
   local diff = vim.fn.system('git diff ' .. file)
   if diff == '' then
@@ -343,7 +303,7 @@ vim.keymap.set('n', '<leader>id', function()
 end, { desc = 'Enviar git diff a AI' })
 
 -- Enviar estructura del proyecto (tree)
-vim.keymap.set('n', '<leader>io', function()
+vim.keymap.set('n', '<leader>ao', function()
   local output
   local method = ""
 

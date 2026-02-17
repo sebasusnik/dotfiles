@@ -26,6 +26,13 @@ Configuración minimalista y zen para desarrollo con Neovim, Tmux, y Oh My Posh.
 - 🖱️ Mouse support habilitado
 - 🎨 Status bar minimalista
 - ⚡ Prefix key: Ctrl+A (en lugar de Ctrl+B)
+- 📋 Copy mode con vi-keys y clipboard integration
+
+### AI Workflow
+- 🤖 Integración con Claude Code y OpenCode
+- 🚀 Comando `dev` para iniciar workspace completo
+- 📤 Shortcuts para enviar código desde Neovim al AI
+- 🎯 Soporte para enviar selecciones, funciones, o archivos completos
 
 ## 🛠️ Prerequisitos
 
@@ -40,14 +47,75 @@ brew install --cask font-hack-nerd-font  # O tu Nerd Font favorita
 
 # Instalar Oh My Posh
 brew install jandedobbeleer/oh-my-posh/oh-my-posh
+
+# Instalar AI tools (opcional pero recomendado)
+npm install -g @anthropic-ai/claude-code  # Claude Code CLI
+npm install -g opencode                   # OpenCode (alternativa)
+```
+
+### Linux (Debian/Ubuntu/Raspberry Pi)
+```bash
+# Actualizar repositorios
+sudo apt update
+
+# Instalar dependencias básicas
+sudo apt install -y neovim tmux ripgrep nodejs npm git curl build-essential
+
+# Instalar Ghostty (opcional - terminal moderno)
+# Ver: https://ghostty.org/docs/install/build
+# O usar tu terminal actual (alacritty, kitty, etc)
+
+# Instalar Oh My Posh (prompt personalizado - opcional)
+curl -s https://ohmyposh.dev/install.sh | bash -s
+
+# Instalar AI tools (opcional pero recomendado)
+npm install -g @anthropic-ai/claude-code  # Claude Code CLI
+npm install -g opencode                   # OpenCode (alternativa)
+
+# Opcional: Instalar Nerd Font
+mkdir -p ~/.local/share/fonts
+cd ~/.local/share/fonts
+curl -fLo "Hack Bold Nerd Font Complete.ttf" \
+  https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/Hack/Bold/HackNerdFont-Bold.ttf
+fc-cache -fv
+```
+
+### Linux (Fedora/RHEL)
+```bash
+# Instalar dependencias
+sudo dnf install -y neovim tmux ripgrep nodejs npm git curl gcc gcc-c++ make
+
+# Instalar Oh My Posh (opcional)
+curl -s https://ohmyposh.dev/install.sh | bash -s
+
+# Instalar AI tools
+npm install -g @anthropic-ai/claude-code
+npm install -g opencode
+```
+
+### Linux (Arch)
+```bash
+# Instalar dependencias
+sudo pacman -S neovim tmux ripgrep nodejs npm git curl base-devel
+
+# Instalar Oh My Posh (opcional - también está en AUR)
+curl -s https://ohmyposh.dev/install.sh | bash -s
+# O desde AUR: yay -S oh-my-posh
+
+# Instalar AI tools
+npm install -g @anthropic-ai/claude-code
+npm install -g opencode
 ```
 
 ## 📥 Instalación
 
 ### Opción 1: Instalación Automática (Recomendado) ⚡
 
+**Compatible con macOS y Linux (Debian/Ubuntu/Fedora/Arch/Raspberry Pi)**
+
 1. **Clonar el repositorio**
 ```bash
+mkdir -p ~/dev
 cd ~/dev
 git clone https://github.com/TU-USUARIO/dotfiles.git
 cd dotfiles
@@ -55,14 +123,18 @@ cd dotfiles
 
 2. **Ejecutar el script de instalación**
 ```bash
+chmod +x install.sh  # Solo la primera vez
 ./install.sh
 ```
 
 El script automáticamente:
+- 🔍 Detecta tu sistema operativo (macOS/Linux)
+- 📦 Ofrece instalar dependencias (solo Linux)
 - ✅ Hace backup de tus configuraciones actuales
 - ✅ Crea todos los symlinks necesarios
 - ✅ Verifica dependencias instaladas
 - ✅ Ofrece instalar plugins de Neovim
+- 🤖 Ofrece migrar Claude Code a instalación local
 
 3. **Reiniciar tu terminal**
 ```bash
@@ -73,6 +145,16 @@ source ~/.zshrc
 4. **Instalar TypeScript globalmente** (si no lo hiciste antes)
 ```bash
 npm install -g typescript
+```
+
+5. **Migrar Claude Code a instalación local** (recomendado)
+```bash
+# Esto evita problemas de permisos y facilita actualizaciones
+sudo claude migrate-installer
+
+# El script ya agregó el alias necesario a ~/.zshrc
+# Verifica que funcione:
+claude --version
 ```
 
 ---
@@ -235,6 +317,70 @@ export TERM=xterm-256color
 Asegúrate de que tu terminal esté usando una Nerd Font:
 - Ghostty: Edita `~/.config/ghostty/config`
 - iTerm2: Preferences → Profiles → Text → Font
+
+### Claude Code: "command not found"
+
+Si instalaste Claude Code con npm pero no funciona:
+```bash
+# Migrar a instalación local (recomendado)
+sudo claude migrate-installer
+
+# Agregar alias si no existe
+echo 'alias claude="$HOME/.claude/local/claude"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+## 🤖 Dev Workflow con AI
+
+Este setup incluye un comando `dev` que inicia un workspace con tmux + nvim + AI tool:
+
+```bash
+# Iniciar con opencode (default)
+dev
+
+# Iniciar con Claude Code
+dev claude
+# o
+dev cc
+
+# Iniciar con opencode explícitamente
+dev opencode
+# o
+dev oc
+```
+
+### Layout del workspace:
+```
+┌─────────────────────┬──────────────┐
+│                     │              │
+│                     │   AI Tool    │
+│      Neovim         │  (Claude/    │
+│                     │   OpenCode)  │
+│                     │              │
+├─────────────────────┤              │
+│   Terminal/Shell    │              │
+└─────────────────────┴──────────────┘
+```
+
+### Enviar código al AI desde Neovim:
+
+Ver [KEYBINDINGS.md](KEYBINDINGS.md) para todos los shortcuts, pero los más útiles:
+- `<Space>ac` - Enviar selección visual al AI
+- `<Space>af` - Enviar función actual al AI
+- `<Space>aa` - Enviar archivo completo al AI
+- `<Space>ad` - Enviar git diff al AI
+
+### Tmux copy mode:
+
+Copiar texto desde tmux al clipboard (ver [KEYBINDINGS.md](KEYBINDINGS.md)):
+```
+1. Ctrl+a [     → Entrar en copy mode
+2. hjkl         → Navegar
+3. v            → Iniciar selección
+4. hjkl         → Seleccionar
+5. y o Enter    → Copiar al clipboard
+6. Cmd+V        → Pegar en cualquier app
+```
 
 ## 📚 Estructura del Proyecto
 

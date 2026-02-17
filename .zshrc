@@ -70,6 +70,7 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 # Aliases
 alias ls='ls --color'
 alias vim='nvim'
+alias claude="/Users/sebasusnik/.claude/local/claude"
 
 # Define the tree function
 function tree() { 
@@ -123,14 +124,38 @@ eval "$(rbenv init -)"
 # ============================================
 
 # Alias principal: matar sesión existente si hay, crear nueva
-alias dev='tmux kill-session -t dev 2>/dev/null; tmux new-session -d -s dev \; \
-    send-keys "nvim ." C-m \; \
-    split-window -h -p 40 \; \
-    send-keys "opencode" C-m \; \
-    select-pane -t 0 \; \
-    split-window -v -p 30 \; \
-    select-pane -t 0 \; \
-    attach'
+# Función dev: inicia tmux con nvim + AI
+# Uso: dev           → usa opencode (default)
+#      dev claude    → usa claude
+#      dev opencode  → usa opencode explícitamente
+dev() {
+    local ai_cmd="opencode"
+
+    # Determinar qué AI usar según el parámetro
+    case "${1:-opencode}" in
+        claude|cc)
+            ai_cmd="claude"
+            ;;
+        opencode|open|oc)
+            ai_cmd="opencode"
+            ;;
+        *)
+            ai_cmd="opencode"
+            ;;
+    esac
+
+    echo "🚀 Iniciando dev session con $ai_cmd..."
+
+    tmux kill-session -t dev 2>/dev/null
+    tmux new-session -d -s dev \; \
+        send-keys "nvim ." C-m \; \
+        split-window -h -p 40 \; \
+        send-keys "$ai_cmd" C-m \; \
+        select-pane -t 0 \; \
+        split-window -v -p 30 \; \
+        select-pane -t 0 \; \
+        attach
+}
 
 # Re-attach a sesión existente (útil si solo cerraste la ventana)
 alias dev-attach='tmux attach -t dev'

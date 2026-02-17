@@ -37,11 +37,6 @@ vim.opt.expandtab = true
 -- ============================================
 vim.g.mapleader = " "
 
--- Atajos básicos
-vim.keymap.set("n", "<leader>w", ":w<CR>", { desc = "Guardar" })
-vim.keymap.set("n", "<leader>q", ":q<CR>", { desc = "Salir" })
-vim.keymap.set("n", "<leader>x", ":x<CR>", { desc = "Guardar y salir" })
-
 -- Navegación entre splits
 vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Panel izquierda" })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Panel derecha" })
@@ -77,145 +72,14 @@ require("lazy").setup({
             "nvim-tree/nvim-web-devicons",
             "MunifTanjim/nui.nvim",
         },
-        config = function()
-            require("neo-tree").setup({
-                close_if_last_window = true,
-                enable_git_status = true,
-                enable_diagnostics = false,
-                popup_border_style = "rounded",
-                window = {
-                    position = "right",
-                    width = 24,
-                    mappings = {
-                        ["<cr>"] = {
-                            function(state)
-                                local node = state.tree:get_node()
-                                if node.type == "directory" then
-                                    require("neo-tree.sources.filesystem.commands").set_root(state)
-                                else
-                                    require("neo-tree.sources.filesystem.commands").open(state)
-                                end
-                            end,
-                            desc = "Open file or enter directory"
-                        },
-                        ["-"] = "navigate_up",
-                        ["<space>"] = "none",
-                        ["<C-w>"] = "none",
-                    }
-                },
-                filesystem = {
-                    filtered_items = {
-                        hide_dotfiles = false,
-                        hide_gitignored = false,
-                    },
-                    follow_current_file = {
-                        enabled = false,
-                    },
-                    group_empty_dirs = false,
-                    use_libuv_file_watcher = false,
-                },
-                default_component_configs = {
-                    container = {
-                        enable_character_fade = false,
-                    },
-                    indent = {
-                        with_markers = false,
-                        indent_size = 2,
-                        padding = 0,
-                    },
-                    icon = {
-                        folder_closed = "󰉋",
-                        folder_open = "󰝰",
-                        folder_empty = "󰉖",
-                        default = "󰈙",
-                    },
-                    modified = {
-                        symbol = "",
-                    },
-                    git_status = {
-                        symbols = {
-                            added     = "",
-                            modified  = "",
-                            deleted   = "",
-                            renamed   = "",
-                            untracked = "",
-                            ignored   = "",
-                            unstaged  = "",
-                            staged    = "",
-                        }
-                    },
-                    name = {
-                        trailing_slash = false,
-                        use_git_status_colors = true,
-                    },
-                },
-            })
-            vim.keymap.set("n", "<leader>e", ":Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
-            vim.keymap.set("n", "-", ":Neotree reveal<CR>", { desc = "Reveal in Neo-tree" })
-            vim.keymap.set("n", "<leader>o", ":Neotree focus<CR>", { desc = "Focus Neo-tree" })
-        end,
+        config = function() require("config.neotree") end,
     },
 
     {
         "nvim-telescope/telescope.nvim",
         branch = "master",
         dependencies = { "nvim-lua/plenary.nvim" },
-        config = function()
-            local builtin = require("telescope.builtin")
-            local actions = require("telescope.actions")
-
-            require("telescope").setup({
-                defaults = {
-                    mappings = {
-                        i = {
-                            ["<esc>"] = actions.close,
-                            ["<C-j>"] = actions.move_selection_next,
-                            ["<C-k>"] = actions.move_selection_previous,
-                        },
-                    },
-                    file_ignore_patterns = {
-                        "node_modules/",
-                        ".git/",
-                        "dist/",
-                        "build/",
-                    },
-                    vimgrep_arguments = {
-                        "rg",
-                        "--color=never",
-                        "--no-heading",
-                        "--with-filename",
-                        "--line-number",
-                        "--column",
-                        "--smart-case",
-                        "--hidden",
-                        "--glob=!.git/",
-                        "--glob=!node_modules/",
-                        "--glob=!dist/",
-                        "--glob=!build/",
-                    },
-                },
-                pickers = {
-                    find_files = {
-                        hidden = true,
-                        previewer = false,
-                    },
-                    live_grep = {
-                        previewer = false,
-                    },
-                    buffers = {
-                        previewer = false,
-                    },
-                    current_buffer_fuzzy_find = {
-                        previewer = false,
-                    },
-                },
-            })
-
-            vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "Buscar archivos" })
-            vim.keymap.set("n", "<leader>g", builtin.live_grep, { desc = "Buscar texto" })
-            vim.keymap.set("n", "<leader>/", builtin.current_buffer_fuzzy_find, { desc = "Buscar en archivo" })
-            vim.keymap.set("n", "<leader>b", builtin.buffers, { desc = "Buscar buffers" })
-        end,
+        config = function() require("config.telescope") end,
     },
 
     -- ======================
@@ -272,107 +136,15 @@ require("lazy").setup({
     -- Treesitter
     -- ======================
     {
-    "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-    config = function()
-        local ok, configs = pcall(require, "nvim-treesitter.configs")
-        if not ok then return end
-
-        configs.setup({
-        ensure_installed = {
-            "lua","vim","vimdoc",
-            "javascript","typescript","tsx",
-            "json","yaml","html","css",
-            "markdown","markdown_inline",
-        },
-        highlight = { enable = true },
-        indent = { enable = true },
-        incremental_selection = {
-            enable = true,
-            keymaps = {
-            init_selection = "<CR>",
-            node_incremental = "<CR>",
-            node_decremental = "<BS>",
-            scope_incremental = "<TAB>",
-            },
-        },
-        -- ============================================
-        -- TEXTOBJECTS: Selección y navegación
-        -- ============================================
-        textobjects = {
-            select = {
-            enable = true,
-            lookahead = true,
-            -- Definir modos de selección (v=charwise, V=linewise)
-            selection_modes = {
-                ['@parameter.outer'] = 'v', -- charwise
-                ['@function.outer'] = 'V',  -- linewise
-                ['@class.outer'] = 'V',     -- linewise
-                ['@conditional.outer'] = 'V',
-                ['@loop.outer'] = 'V',
-                ['@block.outer'] = 'V',
-                ['@comment.outer'] = 'V',
-            },
-            keymaps = {
-                ["af"] = "@function.outer",
-                ["if"] = "@function.inner",
-                ["ac"] = "@class.outer",
-                ["ic"] = "@class.inner",
-                ["aa"] = "@parameter.outer",
-                ["ia"] = "@parameter.inner",
-                ["ai"] = "@conditional.outer",
-                ["ii"] = "@conditional.inner",
-                ["al"] = "@loop.outer",
-                ["il"] = "@loop.inner",
-                ["ab"] = "@block.outer",
-                ["ib"] = "@block.inner",
-                ["a/"] = "@comment.outer",
-            },
-            },
-            move = {
-            enable = true,
-            set_jumps = true,
-            goto_next_start = {
-                ["]m"] = "@function.outer",
-                ["]c"] = "@class.outer",
-                ["]a"] = "@parameter.outer",
-                ["]i"] = "@conditional.outer",
-                ["]l"] = "@loop.outer",
-                ["]b"] = "@block.outer",
-            },
-            goto_next_end = {
-                ["]M"] = "@function.outer",
-                ["]C"] = "@class.outer",
-            },
-            goto_previous_start = {
-                ["[m"] = "@function.outer",
-                ["[c"] = "@class.outer",
-                ["[a"] = "@parameter.outer",
-                ["[i"] = "@conditional.outer",
-                ["[l"] = "@loop.outer",
-                ["[b"] = "@block.outer",
-            },
-            goto_previous_end = {
-                ["[M"] = "@function.outer",
-                ["[C"] = "@class.outer",
-            },
-            },
-            swap = {
-            enable = true,
-            swap_next = {
-                ["<leader>sn"] = "@parameter.inner",
-            },
-            swap_previous = {
-                ["<leader>sp"] = "@parameter.inner",
-            },
-            },
-        },
-        })
-    end,
+        "nvim-treesitter/nvim-treesitter",
+        branch = "main",
+        build = ":TSUpdate",
+        config = function() require("config.treesitter") end,
     },
     {
-    "nvim-treesitter/nvim-treesitter-textobjects",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
+        "nvim-treesitter/nvim-treesitter-textobjects",
+        branch = "main",
+        event = "VeryLazy",
     },
 
     -- ======================
@@ -393,6 +165,7 @@ require("lazy").setup({
 -- ============================================
 -- 6) CARGAR CONFIG MODULAR
 -- ============================================
+-- Ya cargados por lazy.nvim: neotree, telescope, treesitter
 require("config.project_tools")
 require("config.cmp")
 require("config.lsp")
@@ -406,6 +179,12 @@ require("config.zen")
 -- ============================================
 -- 6.5) TEXTOBJECTS (después de que plugins estén cargados)
 -- ============================================
+vim.defer_fn(function()
+  local ok = pcall(require, "config.textobjects")
+  if not ok then
+    print("⚠️  Textobjects no pudo cargar (¿falta nvim-treesitter-textobjects?)")
+  end
+end, 200)
 
 -- ============================================
 -- 7) AI INTEGRATION (OpenCode + Claude Code)

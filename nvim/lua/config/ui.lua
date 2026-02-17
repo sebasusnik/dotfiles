@@ -2,6 +2,44 @@
 -- UI Zen + Craftzdog-like (sin theme)
 -- ============================================
 
+-- 0) Visual mode con color más claro
+vim.api.nvim_set_hl(0, "Visual", { bg = "#4a4a4a", fg = "NONE" })
+
+-- 0.5) Highlight para marcas visuales guardadas (más claro también)
+vim.api.nvim_set_hl(0, "VisualMarks", { bg = "#3a3a3a", fg = "NONE" })
+
+-- Mostrar marcas visuales después de salir del modo visual
+local visual_marks_ns = vim.api.nvim_create_namespace("visual_marks")
+
+vim.api.nvim_create_autocmd("ModeChanged", {
+  pattern = {"*:[vV\x16]*", "[vV\x16]*:*"},
+  callback = function()
+    local mode = vim.fn.mode()
+
+    -- Si salimos del modo visual
+    if not mode:match("[vV\x16]") then
+      -- Limpiar highlights anteriores
+      vim.api.nvim_buf_clear_namespace(0, visual_marks_ns, 0, -1)
+
+      -- Obtener marcas visuales
+      local start_line = vim.fn.line("'<") - 1
+      local end_line = vim.fn.line("'>")
+
+      -- Agregar highlight sutil a las líneas seleccionadas
+      if start_line >= 0 and end_line > start_line then
+        for line = start_line, end_line - 1 do
+          vim.api.nvim_buf_add_highlight(0, visual_marks_ns, "VisualMarks", line, 0, -1)
+        end
+
+        -- Auto-limpiar después de 3 segundos
+        vim.defer_fn(function()
+          vim.api.nvim_buf_clear_namespace(0, visual_marks_ns, 0, -1)
+        end, 3000)
+      end
+    end
+  end,
+})
+
 -- 1) Diagnósticos: limpio, sin ruido inline
 vim.diagnostic.config({
   virtual_text = false,
