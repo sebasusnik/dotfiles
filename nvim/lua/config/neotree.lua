@@ -23,6 +23,7 @@ require("neo-tree").setup({
         end,
         desc = "Open file or enter directory"
       },
+      ["o"] = "toggle_node",  -- Toggle expand/collapse without moving
       ["-"] = "navigate_up",
       ["<space>"] = "none",
       ["<C-w>"] = "none",

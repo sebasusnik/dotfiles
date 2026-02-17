@@ -12,6 +12,7 @@
 
 Inside Neo-tree:
 <CR>            Open file / Enter folder
+o               Toggle folder expand/collapse (without moving)
 -               Go up one level
 ```
 
