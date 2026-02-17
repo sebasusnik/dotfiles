@@ -160,6 +160,14 @@ require("lazy").setup({
     {
     "folke/zen-mode.nvim",
     },
+
+    -- ======================
+    -- Hydra (sticky keymaps)
+    -- ======================
+    {
+        "nvimtools/hydra.nvim",
+        config = function() require("config.hydra") end,
+    },
 })
 
 -- ============================================

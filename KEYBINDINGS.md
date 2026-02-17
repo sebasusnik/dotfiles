@@ -77,13 +77,13 @@ va/             Seleccionar comentario
 
 **Nota:** `vaf` es inteligente - funciona tanto para funciones como para types, interfaces y enums en TypeScript!
 
-### Navegación entre funciones (Modo Sticky 🔥)
+### Navegación entre declaraciones (Modo Sticky 🔥)
 ```
-<leader>n + ] / [   Navegar funciones (mantener Space+n, presionar ] o [)
+<leader>n + ] / [   Navegar declaraciones: funciones, types, variables, etc.
 <Esc>               Salir del modo sticky
 ```
 
-**Modo Sticky 🔥:** Presiona `Space + n` una vez, luego `]` o `[` repetidamente para navegar adelante/atrás!
+**Modo Sticky 🔥:** Presiona `Space + n` una vez, luego `]` o `[` repetidamente para saltar entre cualquier declaración (funciones, types, interfaces, enums, variables)!
 
 ### Navegación estándar (sin sticky)
 ```
@@ -321,9 +321,9 @@ k               Mover línea/selección arriba (repetir sin Space)
 **Workflow:**
 ```
 1. vaf           Seleccionar función
-2. <leader>m     Entrar en modo mover
+2. <leader>m     Entrar en modo mover (sale de visual, guarda posiciones)
 3. j j j j       Mover abajo varias veces (sin presionar Space)
-4. <Esc>         Salir de modo sticky + modo visual
+4. <Esc>         Salir de modo sticky
 ```
 
 ## 📋 Tips

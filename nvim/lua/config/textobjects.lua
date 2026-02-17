@@ -237,3 +237,9 @@ end, { desc = "Anterior función (final)" })
 vim.keymap.set("n", "[C", function()
   ts_move.goto_previous_end("@class.outer")
 end, { desc = "Anterior clase (final)" })
+
+-- ============================================
+-- MOVER LÍNEAS: Ahora configurado en config/hydra.lua
+-- ============================================
+-- Los keymaps de mover líneas están en hydra.nvim para modo "sticky":
+-- <leader>m + j/k (luego solo j/k repetidamente)
