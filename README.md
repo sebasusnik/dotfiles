@@ -1,6 +1,6 @@
-# 🚀 Dotfiles - NVIM ZEN + OPENCODE Workflow
+# 🚀 Dotfiles - NVIM ZEN + AI Workflow
 
-Configuración minimalista y zen para desarrollo con Neovim, Tmux, y Oh My Posh.
+Configuración minimalista y zen para desarrollo con Neovim, Tmux, Claude Code/OpenCode, y Oh My Posh.
 
 ## 📦 Contenido
 
@@ -29,10 +29,11 @@ Configuración minimalista y zen para desarrollo con Neovim, Tmux, y Oh My Posh.
 - 📋 Copy mode con vi-keys y clipboard integration
 
 ### AI Workflow
-- 🤖 Integración con Claude Code y OpenCode
-- 🚀 Comando `dev` para iniciar workspace completo
-- 📤 Shortcuts para enviar código desde Neovim al AI
-- 🎯 Soporte para enviar selecciones, funciones, o archivos completos
+- 🤖 Integración completa con **Claude Code** y **OpenCode**
+- 🚀 Comando `dev` para iniciar workspace tmux con Neovim + AI tool
+- 📤 Shortcuts para enviar código desde Neovim al AI (selecciones, funciones, archivos)
+- 🎯 Workflow optimizado para pair programming con Claude o OpenCode
+- ⚡ Cambio rápido entre Claude Code y OpenCode (`dev claude` / `dev opencode`)
 
 ## 🛠️ Prerequisitos
 
@@ -350,7 +351,9 @@ source ~/.zshrc
 
 ## 🤖 Dev Workflow con AI
 
-Este setup incluye un comando `dev` que inicia un workspace con tmux + nvim + AI tool:
+Este setup incluye un comando `dev` que inicia un workspace completo con tmux + nvim + AI tool (Claude Code u OpenCode):
+
+### Uso del comando `dev`
 
 ```bash
 # Iniciar con opencode (default)
@@ -367,6 +370,14 @@ dev opencode
 dev oc
 ```
 
+**Nota:** El comando `dev` está definido en [shell/.zshrc](shell/.zshrc) y es completamente personalizable.
+
+### Re-conectar a una sesión existente
+
+```bash
+dev-attach  # Útil si cerraste la ventana pero la sesión sigue activa
+```
+
 ### Layout del workspace:
 ```
 ┌─────────────────────┬──────────────┐
@@ -379,6 +390,12 @@ dev oc
 │   Terminal/Shell    │              │
 └─────────────────────┴──────────────┘
 ```
+
+El comando automáticamente:
+- ✅ Crea o recrea la sesión tmux llamada `dev`
+- ✅ Inicia Neovim en el panel principal
+- ✅ Abre Claude Code u OpenCode en el panel derecho (40% de ancho)
+- ✅ Crea un terminal shell en el panel inferior (30% de alto)
 
 ### Enviar código al AI desde Neovim:
 
