@@ -44,7 +44,45 @@ brew install jandedobbeleer/oh-my-posh/oh-my-posh
 
 ## 📥 Instalación
 
-### 1. Clonar el repositorio
+### Opción 1: Instalación Automática (Recomendado) ⚡
+
+1. **Clonar el repositorio**
+```bash
+cd ~/dev
+git clone https://github.com/TU-USUARIO/dotfiles.git
+cd dotfiles
+```
+
+2. **Ejecutar el script de instalación**
+```bash
+./install.sh
+```
+
+El script automáticamente:
+- ✅ Hace backup de tus configuraciones actuales
+- ✅ Crea todos los symlinks necesarios
+- ✅ Verifica dependencias instaladas
+- ✅ Ofrece instalar plugins de Neovim
+
+3. **Reiniciar tu terminal**
+```bash
+# O ejecutar:
+source ~/.zshrc
+```
+
+4. **Instalar TypeScript globalmente** (si no lo hiciste antes)
+```bash
+npm install -g typescript
+```
+
+---
+
+### Opción 2: Instalación Manual 🔧
+
+<details>
+<summary>Click para ver pasos manuales</summary>
+
+#### 1. Clonar el repositorio
 
 ```bash
 cd ~/dev
@@ -52,7 +90,7 @@ git clone https://github.com/TU-USUARIO/dotfiles.git
 cd dotfiles
 ```
 
-### 2. Hacer backup de tu configuración actual (opcional pero recomendado)
+#### 2. Hacer backup de tu configuración actual (opcional pero recomendado)
 
 ```bash
 mv ~/.config/nvim ~/.config/nvim.backup
@@ -61,7 +99,7 @@ mv ~/.zshrc ~/.zshrc.backup
 mv ~/.config/ohmyposh ~/.config/ohmyposh.backup
 ```
 
-### 3. Crear symlinks
+#### 3. Crear symlinks
 
 ```bash
 # Neovim
@@ -77,7 +115,7 @@ ln -sf ~/dev/dotfiles/.zshrc ~/.zshrc
 ln -sf ~/dev/dotfiles/ohmyposh ~/.config/ohmyposh
 ```
 
-### 4. Instalar plugins de Neovim
+#### 4. Instalar plugins de Neovim
 
 ```bash
 nvim
@@ -86,17 +124,19 @@ nvim
 # :checkhealth
 ```
 
-### 5. Recargar Zsh
+#### 5. Recargar Zsh
 
 ```bash
 source ~/.zshrc
 ```
 
-### 6. Instalar TypeScript globalmente (para LSP)
+#### 6. Instalar TypeScript globalmente (para LSP)
 
 ```bash
 npm install -g typescript
 ```
+
+</details>
 
 ## ⌨️ Keybindings Principales
 
