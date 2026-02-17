@@ -1,20 +1,6 @@
-# Neovim
-nvim/lazy-lock.json
-nvim/.luarc.json
-nvim/.DS_Store
+# Archivo local con info personal (no versionar)
+.gitconfig-local
 
-# Oh My Posh cache
-ohmyposh/cache/
-
-# MacOS
+# Otros archivos locales que no deberían subirse
 .DS_Store
-*.swp
-*.swo
-*~
-
-# Backup files
-*.backup
-*.bak
-
-# Local overrides (no commitear)
-*.local
+*.log

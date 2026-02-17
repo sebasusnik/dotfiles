@@ -1,0 +1,5 @@
+# This is Git's per-user configuration file.
+# Info personal se carga desde ~/.gitconfig-local (no versionado)
+
+[include]
+	path = ~/.gitconfig-local
