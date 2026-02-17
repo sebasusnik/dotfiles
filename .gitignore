@@ -1,5 +1,6 @@
-# Archivo local con info personal (no versionar)
+# Archivos locales con info personal (no versionar)
 .gitconfig-local
+.gitconfig-work
 
 # Otros archivos locales que no deberían subirse
 .DS_Store

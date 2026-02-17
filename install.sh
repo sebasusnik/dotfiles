@@ -145,6 +145,75 @@ elif [ "$OS" = "linux" ]; then
 fi
 
 # ============================================
+# Configuración de Git
+# ============================================
+echo ""
+echo "🔧 Configurando Git..."
+echo ""
+
+# Symlink para .gitconfig
+create_symlink "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
+
+# Configurar credenciales de git
+if [ -f "$HOME/.gitconfig-local" ]; then
+    echo -e "${GREEN}✓${NC} .gitconfig-local ya existe (omitiendo configuración)"
+else
+    echo -e "${BLUE}ℹ️  Configurando credenciales de Git${NC}"
+    echo ""
+
+    # Preguntar nombre
+    read -p "Tu nombre completo: " git_name
+
+    # Preguntar email personal
+    read -p "Tu email personal: " git_email
+
+    # Preguntar si tiene proyectos de trabajo
+    echo ""
+    read -p "¿Tienes proyectos de trabajo con email diferente? (y/n) " -n 1 -r
+    echo ""
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        # Preguntar email de trabajo
+        read -p "Tu email de trabajo: " git_work_email
+
+        # Preguntar directorio de trabajo
+        read -p "Ruta de tus proyectos de trabajo (ej: ~/work/): " work_dir
+
+        # Expandir ~ a $HOME si está presente
+        work_dir="${work_dir/#\~/$HOME}"
+
+        # Crear .gitconfig-work
+        cat > "$HOME/.gitconfig-work" << EOF
+[user]
+	name = $git_name
+	email = $git_work_email
+EOF
+        echo -e "${GREEN}✓${NC} .gitconfig-work creado"
+
+        # Crear .gitconfig-local con includeIf
+        cat > "$HOME/.gitconfig-local" << EOF
+[user]
+	name = $git_name
+	email = $git_email
+
+# Configuración condicional para proyectos de trabajo
+[includeIf "gitdir:$work_dir"]
+	path = ~/.gitconfig-work
+EOF
+    else
+        # Crear .gitconfig-local sin includeIf
+        cat > "$HOME/.gitconfig-local" << EOF
+[user]
+	name = $git_name
+	email = $git_email
+EOF
+    fi
+
+    echo -e "${GREEN}✓${NC} .gitconfig-local creado"
+    echo ""
+fi
+
+# ============================================
 # Verificar dependencias
 # ============================================
 echo ""
