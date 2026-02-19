@@ -264,6 +264,13 @@ require("lazy").setup({
     },
 
     -- ======================
+    -- Scrollbar
+    -- ======================
+    {
+      "petertriho/nvim-scrollbar",
+    },
+
+    -- ======================
     -- Zen mode
     -- ======================
     {
@@ -489,6 +496,7 @@ require("config.lint")
 require("config.snippets")
 require("config.ui")
 require("config.gitsigns")
+require("config.scrollbar")
 require("config.zen")
 
 -- ============================================
