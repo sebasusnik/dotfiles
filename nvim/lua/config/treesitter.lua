@@ -8,10 +8,24 @@ if not ok then return end
 
 configs.setup({
   ensure_installed = {
-    "lua", "vim", "vimdoc",
-    "javascript", "typescript", "tsx",
-    "json", "yaml", "html", "css",
+    -- Core
+    "lua", "vim", "vimdoc", "query",
+    -- Web dev
+    "javascript", "typescript", "tsx", "jsx",
+    "html", "css", "scss",
+    -- Data formats
+    "json", "jsonc", "yaml", "toml", "xml",
+    -- Documentation
     "markdown", "markdown_inline",
+    -- Shell/Config
+    "bash", "fish", "zsh",
+    "dockerfile", "make",
+    -- Git
+    "git_config", "git_rebase", "gitcommit", "gitignore",
+    -- Other languages
+    "python", "rust", "go", "c", "cpp",
+    -- Misc
+    "regex", "comment",
   },
   highlight = { enable = true },
   indent = { enable = true },
@@ -21,7 +35,6 @@ configs.setup({
       init_selection = "<CR>",
       node_incremental = "<CR>",
       node_decremental = "<BS>",
-      scope_incremental = "<TAB>",
     },
   },
 })

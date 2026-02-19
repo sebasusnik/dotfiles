@@ -8,6 +8,7 @@ Minimalist and zen configuration for development with Neovim, Tmux, Claude Code/
 - **Tmux** - Configuration for workflow with Neovim + OpenCode
 - **Zsh** - Shell configuration with Oh My Posh
 - **Oh My Posh** - Custom terminal prompt
+- **AI Tools** - llm, mods, and CodeCompanion for AI-powered workflow
 
 ## ✨ Features
 
@@ -28,12 +29,21 @@ Minimalist and zen configuration for development with Neovim, Tmux, Claude Code/
 - ⚡ Prefix key: Ctrl+A (instead of Ctrl+B)
 - 📋 Copy mode with vi-keys and clipboard integration
 
-### AI Workflow
-- 🤖 Full integration with **Claude Code** and **OpenCode**
+### AI Workflow (Dual Architecture)
+
+**Carril A - External AI (Deep Reasoning):**
+- 🤖 Full integration with **Claude Code** and **OpenCode** in tmux right pane
 - 🚀 `dev` command to start tmux workspace with Neovim + AI tool
-- 📤 Shortcuts to send code from Neovim to AI (selections, functions, files)
-- 🎯 Optimized workflow for pair programming with Claude or OpenCode
+- 📤 Shortcuts to send code from Neovim to AI (`<leader>a*`)
+- 🎯 Optimized for complex tasks and deep reasoning
 - ⚡ Quick switch between Claude Code and OpenCode (`dev claude` / `dev opencode`)
+
+**Carril B - Lightweight AI (Quick Tasks):**
+- 💻 **llm** - Terminal AI for quick command lookup (`cmd?`)
+- 📝 **mods** - Pipeline AI for analyzing command output
+- 🧠 **CodeCompanion** - Copilot-like inline completions in Neovim (`<leader>c*`)
+- 🔧 Model-agnostic: Works with any OpenAI-compatible API (Kimi, OpenAI, etc.)
+- 💰 Cost-optimized: Uses lite models for simple tasks, plus models for code
 
 ## 🛠️ Prerequisites
 
@@ -54,6 +64,10 @@ brew install jandedobbeleer/oh-my-posh/oh-my-posh
 # Install AI tools (optional but recommended)
 npm install -g @anthropic-ai/claude-code  # Claude Code CLI
 npm install -g opencode                   # OpenCode (alternative)
+
+# AI tools for lightweight tasks (optional)
+pipx install llm                          # Terminal AI for commands
+brew install charmbracelet/tap/mods       # Pipeline AI for output analysis
 ```
 
 ### Linux (Debian/Ubuntu/Raspberry Pi)
@@ -77,6 +91,10 @@ curl -s https://ohmyposh.dev/install.sh | bash -s
 # Install AI tools (optional but recommended)
 npm install -g @anthropic-ai/claude-code  # Claude Code CLI
 npm install -g opencode                   # OpenCode (alternative)
+
+# AI tools for lightweight tasks (optional)
+pipx install llm                          # Terminal AI for commands
+# mods: install via Go - go install github.com/charmbracelet/mods@latest
 
 # Optional: Install Nerd Font
 mkdir -p ~/.local/share/fonts
@@ -138,6 +156,7 @@ The script automatically:
 - 📦 Offers to install missing dependencies (macOS with Homebrew, Linux with apt/dnf/pacman)
 - 🍺 Installs Homebrew on macOS if not present
 - 🎨 Offers to install optional dependencies (oh-my-posh, ghostty)
+- 🤖 Offers to install AI tools (llm, mods) and configure credentials in `~/.zshenv`
 - 🔧 Configures Git with your credentials (personal and work)
 - ✅ Backs up your current configurations
 - ✅ Creates all necessary symlinks
@@ -161,12 +180,48 @@ This will configure Git to automatically use the correct email based on the dire
 source ~/.zshrc
 ```
 
-5. **Install TypeScript globally** (if you didn't before)
+5. **Configure AI credentials** (optional but recommended)
+
+Create `~/.zshenv` with your AI provider credentials (this file is NOT tracked by git):
+
+```bash
+# Create the file
+cat > ~/.zshenv << 'EOF'
+# AI Provider Configuration (OpenAI-compatible API)
+# You can use different API keys for terminal tools vs Neovim
+
+# For terminal tools (llm, mods) - uses lite models
+export AI_LITE_API_KEY="your-api-key-for-terminal"
+
+# For Neovim (CodeCompanion) - uses plus models  
+export AI_PLUS_API_KEY="your-api-key-for-neovim"
+
+# Common settings
+export AI_BASE_URL="https://api.moonshot.ai/v1"
+export AI_MODEL_LITE="kimi-lite"      # Fast/cheap for simple tasks
+export AI_MODEL_PLUS="kimi-plus"      # Strong for code/complex tasks
+
+# Backwards compatibility
+export OPENAI_API_KEY="$AI_LITE_API_KEY"
+export OPENAI_BASE_URL="$AI_BASE_URL"
+EOF
+```
+
+**Note:** You can use the same API key for both, or different ones. The install script will guide you through this.
+
+**Note:** You can also run `./install.sh` and it will guide you through this setup interactively.
+
+**Supported providers:**
+- **Kimi** (default): `https://api.moonshot.ai/v1`
+- **OpenAI**: `https://api.openai.com/v1`
+- **Any OpenAI-compatible API**
+
+6. **Install TypeScript globally** (if you didn't before)
 ```bash
 npm install -g typescript
 ```
 
-6. **Migrate Claude Code to local installation** (recommended)
+7. **Migrate Claude Code to local installation** (recommended)
 ```bash
 # This avoids permission issues and facilitates updates
 sudo claude migrate-installer
@@ -346,6 +401,57 @@ sudo claude migrate-installer
 
 # Add alias if it doesn't exist
 echo 'alias claude="$HOME/.claude/local/claude"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+### AI Tools: "AI_LITE_API_KEY not configured"
+
+If you see this warning when running `cmd?` or `ai?`:
+
+```bash
+# 1. Verify ~/.zshenv exists and has your API keys
+cat ~/.zshenv
+
+# 2. If it doesn't exist, create it:
+cat > ~/.zshenv << 'EOF'
+# Terminal tools (llm, mods)
+export AI_LITE_API_KEY="your-api-key-here"
+
+# Neovim (CodeCompanion)
+export AI_PLUS_API_KEY="your-api-key-here"
+
+# Common settings
+export AI_BASE_URL="https://api.moonshot.ai/v1"
+export AI_MODEL_LITE="kimi-lite"
+export AI_MODEL_PLUS="kimi-plus"
+EOF
+
+# 3. Reload your shell
+source ~/.zshrc
+
+# 4. Verify it's working
+echo $AI_LITE_API_KEY
+echo $AI_PLUS_API_KEY
+```
+
+**Note:** `~/.zshenv` is NOT tracked by git, so it's safe to store your API keys there.
+
+### AI Tools: llm or mods not found
+
+If the AI commands don't work after installation:
+
+```bash
+# For llm (installed via pipx)
+pipx install llm
+pipx ensurepath
+
+# For mods (macOS)
+brew install charmbracelet/tap/mods
+
+# For mods (Linux - requires Go)
+go install github.com/charmbracelet/mods@latest
+
+# Then reload your shell
 source ~/.zshrc
 ```
 

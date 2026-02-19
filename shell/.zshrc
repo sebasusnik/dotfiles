@@ -70,7 +70,6 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 # Aliases
 alias ls='ls --color'
 alias vim='nvim'
-alias claude="/Users/sebasusnik/.claude/local/claude"
 
 # Define the tree function
 function tree() { 
@@ -176,3 +175,41 @@ alias nn='nvim .'
 
 # Abrir último archivo editado en nvim
 alias n-last='nvim -c "normal '\''0"'
+
+# ============================================
+# LLM AI HELPERS
+# ============================================
+
+# Helper function: cmd - Get shell commands quickly
+cmd() {
+  local q="$*"
+  if command -v llm &> /dev/null; then
+    llm \
+      -m "$LLM_MODEL" \
+      -s "Return ONLY a shell command. No explanation. One line." \
+      "$q"
+  else
+    echo "llm not installed. Run: pipx install llm"
+  fi
+}
+
+# Helper function: run - Get and execute shell commands
+run() {
+  local q="$*"
+  if ! command -v llm &> /dev/null; then
+    echo "llm not installed. Run: pipx install llm"
+    return 1
+  fi
+
+  local cmd=$(llm \
+    -m "$LLM_MODEL" \
+    -s "Return ONLY a shell command. No explanation. One line." \
+    "$q" | head -1)
+
+  echo "$cmd"
+  echo -n "Run? [y/N] "
+  read confirm
+  if [[ "$confirm" == "y" || "$confirm" == "Y" ]]; then
+    eval "$cmd"
+  fi
+}

@@ -9,8 +9,9 @@ require("neo-tree").setup({
   enable_diagnostics = false,
   popup_border_style = "rounded",
   window = {
+    transparent_panel = true,  -- Make background transparent
     position = "right",
-    width = 24,
+    width = 35,  -- Wider to show file info comfortably
     mappings = {
       ["<cr>"] = {
         function(state)
@@ -73,6 +74,18 @@ require("neo-tree").setup({
     name = {
       trailing_slash = false,
       use_git_status_colors = true,
+    },
+    file_size = {
+      enabled = true,
+      required_width = 30,  -- Show at smaller width
+    },
+    type = {
+      enabled = true,
+      required_width = 80,  -- Show file type at larger width
+    },
+    last_modified = {
+      enabled = false,  -- Disable to save space
+      required_width = 88,
     },
   },
 })

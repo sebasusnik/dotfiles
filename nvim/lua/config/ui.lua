@@ -95,13 +95,41 @@ vim.api.nvim_create_autocmd("CursorHold", {
 })
 
 local function transparent()
+  -- Editor background
   vim.api.nvim_set_hl(0, "Normal",      { bg = "NONE" })
   vim.api.nvim_set_hl(0, "NormalNC",    { bg = "NONE" })
   vim.api.nvim_set_hl(0, "SignColumn",  { bg = "NONE" })
   vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "NONE" })
   vim.api.nvim_set_hl(0, "MsgArea",     { bg = "NONE" })
+
+  -- Line numbers
+  vim.api.nvim_set_hl(0, "LineNr",       { bg = "NONE" })
+  vim.api.nvim_set_hl(0, "LineNrAbove",  { bg = "NONE" })
+  vim.api.nvim_set_hl(0, "LineNrBelow",  { bg = "NONE" })
+  vim.api.nvim_set_hl(0, "CursorLineNr", { bg = "NONE", bold = true })
+
+  -- Floating windows
   vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
   vim.api.nvim_set_hl(0, "FloatBorder", { bg = "NONE" })
+
+  -- Neo-tree specific
+  vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "NONE" })
+  vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "NONE" })
+  vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "NONE" })
+  vim.api.nvim_set_hl(0, "NeoTreeVertSplit", { bg = "NONE", fg = "NONE" })
+  vim.api.nvim_set_hl(0, "NeoTreeWinSeparator", { bg = "NONE", fg = "NONE" })
+
+  -- General window separators
+  vim.api.nvim_set_hl(0, "VertSplit", { bg = "NONE", fg = "NONE" })
+  vim.api.nvim_set_hl(0, "WinSeparator", { bg = "NONE", fg = "NONE" })
+
+  -- Git signs (keep foreground colors, remove background)
+  vim.api.nvim_set_hl(0, "GitSignsAdd", { bg = "NONE" })
+  vim.api.nvim_set_hl(0, "GitSignsChange", { bg = "NONE" })
+  vim.api.nvim_set_hl(0, "GitSignsDelete", { bg = "NONE" })
+  vim.api.nvim_set_hl(0, "GitSignsTopdelete", { bg = "NONE" })
+  vim.api.nvim_set_hl(0, "GitSignsChangedelete", { bg = "NONE" })
+  vim.api.nvim_set_hl(0, "GitSignsUntracked", { bg = "NONE" })
 end
 
 transparent()

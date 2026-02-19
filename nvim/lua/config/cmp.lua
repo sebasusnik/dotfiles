@@ -14,11 +14,13 @@ cmp.setup({
     ["<CR>"] = cmp.mapping.confirm({ select = true }),
 
     ["<Tab>"] = cmp.mapping(function(fallback)
+      -- Priority: cmp menu > luasnip > minuet > fallback
       if cmp.visible() then
         cmp.select_next_item()
       elseif luasnip.expand_or_jumpable() then
         luasnip.expand_or_jump()
       else
+        -- Let minuet handle Tab if it has a suggestion, otherwise fallback
         fallback()
       end
     end, { "i", "s" }),

@@ -11,8 +11,8 @@
 -               Reveal current file in Neo-tree
 
 Inside Neo-tree:
-<CR>            Open file / Enter folder
-o               Toggle folder expand/collapse (without moving)
+<CR>            Open file (on file) / Set as root (on directory)
+o               Toggle folder expand/collapse
 -               Go up one level
 ```
 
@@ -30,6 +30,37 @@ Inside Telescope:
 <C-k>           Previous result
 ```
 
+## ✏️ Editing Enhancements
+
+### Autopairs
+```
+( [ { " '    Auto-closes the pair as you type
+```
+
+### Surround (nvim-surround)
+```
+cs"'         Change surrounding " to '  →  "text" → 'text'
+cs({         Change surrounding ( to {  →  (text) → { text }
+ds"          Delete surrounding "       →  "text" → text
+ysiw"        Surround word with "       →  text → "text"
+yss"         Surround entire line with "
+S"           Surround visual selection with " (visual mode)
+```
+
+### Comments (gcc / gc)
+```
+gcc          Toggle comment on current line
+gc           Toggle comment on selection (visual mode)
+gcap         Toggle comment on paragraph
+```
+Note: JSX/TSX-aware — uses `{/* */}` inside JSX, `//` elsewhere.
+
+### Sessions (persistence.nvim)
+```
+<leader>xr   Restore session for current directory
+<leader>xq   Stop saving session
+```
+
 ## 💾 Basics
 
 ### File (native Vim commands)
@@ -40,17 +71,40 @@ Inside Telescope:
 :x / :wq        Save and quit
 ```
 
-### Windows (Splits)
+### Buffers (open files)
 ```
-<C-h>           Go to left panel
-<C-l>           Go to right panel
-<C-j>           Go to panel below
-<C-k>           Go to panel above
+<Space><Space>  Toggle between last 2 files (fastest)
+<leader>b       List all open files (Telescope)
+<leader>q       Close current file
 ```
 
-## 🤖 AI Integration (Claude Code + OpenCode)
+### Splits (view two files side by side)
+```
+<Space>wv       Open vertical split
+<Space>ws       Open horizontal split
+<Space>wh       Go to left split
+<Space>wl       Go to right split
+<Space>wj       Go to split below
+<Space>wk       Go to split above
+<Space>wq       Close current split
 
-### Send code to AI
+From Neo-tree:
+<C-v>           Open file in vertical split
+<C-x>           Open file in horizontal split
+```
+
+**Workflow - two files side by side:**
+```
+1. Open first file normally (<Space>f or <CR> in Neo-tree)
+2. <Space>wv    Open vertical split
+3. <Space>f     Find and open second file in the new split
+4. <Space>wh/wl Switch between the two sides
+```
+
+## 🤖 AI Integration (Dual Architecture)
+
+### External AI: OpenCode/Claude (in tmux right pane)
+Send code to AI tool running in the right tmux pane:
 ```
 <leader>ac      Send visual selection
 <leader>aa      Send entire file
@@ -62,6 +116,50 @@ Inside Telescope:
 ```
 
 **Note:** `<leader>af` is now smart - automatically detects if you're in a function, type, interface or enum!
+
+### Inline AI: Minuet (ghost text completions)
+Ghost text suggestions while you type, powered by AI:
+```
+<Tab>           Accept full suggestion (insert mode)
+<S-Tab>         Dismiss suggestion
+<A-a>           Accept one line only
+<A-[>           Previous suggestion
+<A-]>           Next suggestion
+
+<leader>ae      Enable Minuet
+<leader>at      Toggle Minuet on/off
+<leader>am      Change AI model interactively
+```
+
+## 🖥️ Terminal AI Commands
+
+### llm - AI for terminal commands (uses AI_LITE_API_KEY)
+```
+cmd? "description"    Get shell command from description
+ai? "question"        Get quick AI answer
+```
+
+**Examples:**
+```bash
+cmd? "extract tar.zst file"           → tar --zstd -xvf file.tar.zst
+cmd? "find files modified today"      → find . -type f -mtime -1
+ai? "what is docker compose"          → Docker Compose is a tool...
+```
+
+### mods - AI for pipeline analysis (uses AI_LITE_API_KEY)
+```
+cat file | mods "prompt"              Analyze command output with AI
+MODS_MODEL="$AI_MODEL_PLUS" cat file | mods "prompt"   Use strong model
+```
+
+**Examples:**
+```bash
+history | tail -n 50 | mods "find the git rebase command"
+cat error.log | mods "summarize this error"
+MODS_MODEL="$AI_MODEL_PLUS" cat stacktrace.log | mods "explain root cause"
+```
+
+**Note:** Terminal tools use `AI_LITE_API_KEY`. For CodeCompanion in Neovim, use `AI_PLUS_API_KEY`.
 
 ## 🎯 Textobjects (Treesitter)
 
@@ -118,7 +216,6 @@ K               Hover (documentation)
 ```
 <CR>            Start/expand selection
 <BS>            Shrink selection
-<TAB>           Expand by scope
 ```
 
 ### Useful

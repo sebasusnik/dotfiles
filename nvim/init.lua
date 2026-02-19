@@ -18,7 +18,7 @@ vim.opt.wrap = false
 vim.opt.scrolloff = 8
 vim.opt.sidescrolloff = 8
 vim.opt.termguicolors = true
-vim.cmd.colorscheme("default")
+-- Using Neovim's default with treesitter for full syntax highlighting
 
 -- ============================================
 -- 2) COMPORTAMIENTO
@@ -38,10 +38,17 @@ vim.opt.expandtab = true
 vim.g.mapleader = " "
 
 -- Navegación entre splits
-vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Panel izquierda" })
-vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Panel derecha" })
-vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Panel abajo" })
-vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Panel arriba" })
+vim.keymap.set("n", "<leader>wh", "<C-w>h", { desc = "Split izquierda" })
+vim.keymap.set("n", "<leader>wl", "<C-w>l", { desc = "Split derecha" })
+vim.keymap.set("n", "<leader>wj", "<C-w>j", { desc = "Split abajo" })
+vim.keymap.set("n", "<leader>wk", "<C-w>k", { desc = "Split arriba" })
+vim.keymap.set("n", "<leader>wq", "<C-w>q", { desc = "Cerrar split" })
+vim.keymap.set("n", "<leader>wv", "<C-w>v", { desc = "Split vertical" })
+vim.keymap.set("n", "<leader>ws", "<C-w>s", { desc = "Split horizontal" })
+
+-- Navegación entre buffers (archivos abiertos)
+vim.keymap.set("n", "<leader><leader>", "<C-^>", { desc = "Alternar últimos 2 archivos" })
+vim.keymap.set("n", "<leader>q", ":bd<CR>", { desc = "Cerrar archivo" })
 
 -- ============================================
 -- 4) BOOTSTRAP LAZY.NVIM
@@ -133,6 +140,28 @@ require("lazy").setup({
     { "nvim-tree/nvim-web-devicons" },
 
     -- ======================
+    -- Theme Manager
+    -- ======================
+    {
+        "zaldih/themery.nvim",
+        config = function() require("config.themery") end,
+    },
+
+    -- Popular colorschemes
+    { "catppuccin/nvim", name = "catppuccin" },
+    { "rose-pine/neovim", name = "rose-pine" },
+    { "folke/tokyonight.nvim" },
+    { "rebelot/kanagawa.nvim" },
+    { "EdenEast/nightfox.nvim" },
+    { "ellisonleao/gruvbox.nvim" },
+    { "Mofiqul/dracula.nvim" },
+    { "navarasu/onedark.nvim" },
+    { "sainnhe/everforest" },
+    { "projekt0n/github-nvim-theme" },
+    { "bluz71/vim-moonfly-colors", name = "moonfly" },
+    { "nyoom-engineering/oxocarbon.nvim" },
+
+    -- ======================
     -- Treesitter
     -- ======================
     {
@@ -167,6 +196,75 @@ require("lazy").setup({
     {
         "nvimtools/hydra.nvim",
         config = function() require("config.hydra") end,
+    },
+
+    -- ======================
+    -- Which-key (keybinding hints)
+    -- ======================
+    {
+        "folke/which-key.nvim",
+        event = "VeryLazy",
+        config = function() require("config.which-key") end,
+    },
+
+    -- ======================
+    -- Flash (fast navigation)
+    -- ======================
+    {
+        "folke/flash.nvim",
+        event = "VeryLazy",
+        config = function() require("config.flash") end,
+    },
+
+    -- ======================
+    -- AI Autocompletion (Minuet)
+    -- ======================
+    {
+        "milanglacier/minuet-ai.nvim",
+        dependencies = {
+            "nvim-cmp",
+        },
+        config = function() require("config.minuet") end,
+    },
+
+    -- ======================
+    -- Autopairs
+    -- ======================
+    {
+        "windwp/nvim-autopairs",
+        event = "InsertEnter",
+        config = function() require("config.autopairs") end,
+    },
+
+    -- ======================
+    -- Surround
+    -- ======================
+    {
+        "kylechui/nvim-surround",
+        event = "VeryLazy",
+        config = function() require("nvim-surround").setup() end,
+    },
+
+    -- ======================
+    -- Comments (con soporte JSX/TSX)
+    -- ======================
+    {
+        "JoosepAlviste/nvim-ts-context-commentstring",
+        lazy = true,
+    },
+    {
+        "numToStr/Comment.nvim",
+        event = "VeryLazy",
+        config = function() require("config.comment") end,
+    },
+
+    -- ======================
+    -- Sessions
+    -- ======================
+    {
+        "folke/persistence.nvim",
+        lazy = false,
+        config = function() require("config.session") end,
     },
 })
 
