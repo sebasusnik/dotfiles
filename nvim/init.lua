@@ -71,8 +71,16 @@ vim.opt.ruler = false
 vim.opt.signcolumn = "yes"
 vim.opt.colorcolumn = ""
 vim.opt.wrap = false
+vim.opt.linebreak = true   -- wrap at word boundaries when wrap is on
+vim.opt.breakindent = true -- preserve indentation on wrapped lines
 vim.opt.scrolloff = 8
 vim.opt.sidescrolloff = 8
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "html", "javascriptreact", "typescriptreact", "vue", "svelte", "json" },
+  callback = function() vim.opt_local.wrap = true end,
+  desc = "Wrap long lines in template/markup files (Tailwind classes)",
+})
 vim.opt.termguicolors = true
 -- Using Neovim's default with treesitter for full syntax highlighting
 
@@ -110,7 +118,7 @@ vim.keymap.set("n", "<leader>q", ":bd<CR>", { desc = "Cerrar archivo" })
 -- 4) BOOTSTRAP LAZY.NVIM
 -- ============================================
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
     vim.fn.system({
         "git", "clone", "--filter=blob:none",
         "https://github.com/folke/lazy.nvim.git",
