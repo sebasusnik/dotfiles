@@ -89,11 +89,11 @@ local function stop_client(bufnr, name)
 end
 
 local function enable_server(server_name)
-  vim.lsp.config(server_name, {
-    capabilities = cmpcfg.capabilities,
-    settings = server_name == "eslint" and { format = false } or nil,
-  })
-
+  local cfg = { capabilities = cmpcfg.capabilities }
+  if server_name == "eslint" then
+    cfg.settings = { format = false }
+  end
+  vim.lsp.config(server_name, cfg)
   vim.lsp.enable(server_name, true)
 end
 

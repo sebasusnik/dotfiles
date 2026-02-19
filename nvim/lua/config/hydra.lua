@@ -173,7 +173,7 @@ local function goto_next_declaration()
    if not trees or #trees == 0 then return end
 
    local root = trees[1]:root()
-   local best_node = nil
+   local best_node ---@type TSNode?
    local best_row = math.huge
 
    -- Función recursiva para visitar nodos
@@ -233,7 +233,7 @@ local function goto_prev_declaration()
    if not trees or #trees == 0 then return end
 
    local root = trees[1]:root()
-   local best_node = nil
+   local best_node ---@type TSNode?
    local best_row = -1
 
    -- Función recursiva para visitar nodos

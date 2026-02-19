@@ -28,7 +28,7 @@ local function get_function_node_at_cursor(bufnr)
   -- Subimos por los parents buscando algo que "sea una función"
   while node do
     local t = node:type()
-    local found_node = nil
+    local found_node ---@type TSNode?
 
     -- Casos directos
     if t == "function_declaration"
@@ -102,7 +102,7 @@ local function get_type_node_at_cursor(bufnr)
 
   while node do
     local t = node:type()
-    local found_node = nil
+    local found_node ---@type TSNode?
 
     -- Types, interfaces, enums, variables - SOLO OUTER nodes
     if t == "type_alias_declaration"
@@ -130,7 +130,7 @@ local function get_type_node_at_cursor(bufnr)
 end
 
 local function select_node_range(node)
-  local srow, scol, erow, ecol = node:range()
+  local srow, _, erow, _ = node:range()
   -- node:range() devuelve 0-indexed, erow es EXCLUSIVO
 
   local start_line = srow + 1
@@ -354,7 +354,7 @@ end, { desc = 'Enviar git diff a AI' })
 
 -- Enviar estructura del proyecto (tree)
 vim.keymap.set('n', '<leader>ao', function()
-  local output
+  local output ---@type string
   local method = ""
 
   -- Verificar si eza está disponible (preferido)

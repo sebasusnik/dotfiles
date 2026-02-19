@@ -112,7 +112,7 @@ if [ "$OS" = "macos" ]; then
             echo -e "${GREEN}✓${NC} $CMD ya instalado"
         fi
     done
-    
+
     # Check Ghostty separately (app bundle, not CLI)
     if [ -d "/Applications/Ghostty.app" ]; then
         echo -e "${GREEN}✓${NC} Ghostty ya instalado"
@@ -534,23 +534,23 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo ""
     echo "Puedes usar la misma API key para ambos o diferentes."
     echo ""
-    
+
     # Lite API Key (for terminal tools: llm, mods)
     read -p "API Key para terminal (llm/mods) [misma que Neovim]: " ai_lite_api_key
-    
+
     # Plus API Key (for CodeCompanion in Neovim)
     read -p "API Key para Neovim (CodeCompanion) [misma que terminal]: " ai_plus_api_key
-    
+
     # If plus key is empty, use lite key
     if [ -z "$ai_plus_api_key" ]; then
         ai_plus_api_key="${ai_lite_api_key:-}"
     fi
-    
+
     # If lite key is empty, use plus key
     if [ -z "$ai_lite_api_key" ]; then
         ai_lite_api_key="${ai_plus_api_key:-}"
     fi
-    
+
     # At least one must be set
     while [ -z "$ai_lite_api_key" ] && [ -z "$ai_plus_api_key" ]; do
         echo -e "${YELLOW}⚠️  Al menos una API Key es requerida${NC}"
@@ -558,11 +558,11 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         ai_lite_api_key="$ai_key"
         ai_plus_api_key="$ai_key"
     done
-    
+
     # Base URL
     read -p "Base URL [https://api.moonshot.ai/v1]: " ai_base_url
     ai_base_url="${ai_base_url:-https://api.moonshot.ai/v1}"
-    
+
     # Models
     echo ""
     echo "Modelos disponibles (sin prefijos):"
@@ -614,7 +614,7 @@ export MODS_MODEL_PLUS="\$AI_MODEL_PLUS"
 export MODS_MODEL="\$MODS_MODEL_LITE"  # Default model
 export MODS_OPENAI_API_KEY="\$AI_API_KEY_LITE"
 EOF
-    
+
     echo -e "${GREEN}✓${NC} Configuración AI guardada en ~/.zshenv"
     echo ""
     echo -e "${YELLOW}⚠️  IMPORTANTE:${NC}"

@@ -34,7 +34,7 @@ local function find_type_or_function_node()
   -- Buscar nodo válido (solo nodos OUTER, no inner)
   while node do
     local node_type = node:type()
-    local found_node = nil
+    local found_node ---@type TSNode?
 
     -- Funciones (outer)
     if node_type == "function_declaration"
@@ -85,7 +85,7 @@ local function select_node_range(node)
     return false
   end
 
-  local start_row, start_col, end_row, end_col = node:range()
+  local start_row, _, end_row, _ = node:range()
 
   -- node:range() devuelve 0-indexed, end_row es EXCLUSIVO
   -- Para seleccionar hasta la última línea en Vim (1-indexed), necesitamos end_row + 1

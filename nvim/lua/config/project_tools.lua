@@ -30,7 +30,7 @@ local function workspace_root(startpath)
     parent = dirname(dir)
   end
 
-  return uv.cwd()
+  return uv.cwd() or ""
 end
 
 -- Encuentra el package root (el package.json más cercano) dentro del workspace
@@ -91,7 +91,7 @@ local function add_bins_to_path(pkg_root, ws_root)
 end
 
 local function empty_result()
-  local cwd = uv.cwd()
+  local cwd = uv.cwd() or ""
   return {
     ws_root = cwd,
     pkg_root = cwd,
@@ -106,7 +106,7 @@ end
 -- detect_by_path: acepta string (path) o number (bufnr)
 -- ============================================================
 function M.detect_by_path(input)
-  local fname = nil
+  local fname ---@type string?
 
   if type(input) == "string" then
     fname = input
