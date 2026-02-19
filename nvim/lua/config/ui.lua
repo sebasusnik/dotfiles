@@ -63,14 +63,37 @@ vim.diagnostic.config({
   },
 })
 
--- 3) Bordes rounded para TODO floating preview (esto faltaba)
+-- 3) Bordes rounded para TODO floating preview + treesitter injection in hover buffers
 do
   local orig = vim.lsp.util.open_floating_preview
   ---@diagnostic disable-next-line: duplicate-set-field
   function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
     opts = opts or {}
     opts.border = opts.border or "rounded"
-    return orig(contents, syntax, opts, ...)
+    local bufnr, winnr = orig(contents, syntax, opts, ...)
+    if syntax == "markdown" and bufnr and vim.api.nvim_buf_is_valid(bufnr) then
+      vim.defer_fn(function()
+        if not vim.api.nvim_buf_is_valid(bufnr) then return end
+        local text = table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n")
+        if text:match("[%.#]?[%w-]+%s*{[^}]-:[^}]-}") then
+          -- Strip markdown code-fence lines (```css / ```) that stylize_markdown
+          -- leaves in the buffer, then start a CSS treesitter parser.
+          local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+          local clean = {}
+          for _, line in ipairs(lines) do
+            if not line:match("^%s*```") then
+              clean[#clean + 1] = line
+            end
+          end
+          vim.bo[bufnr].modifiable = true
+          vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, clean)
+          vim.bo[bufnr].modifiable = false
+          pcall(vim.treesitter.stop, bufnr)
+          vim.bo[bufnr].filetype = "css"
+        end
+      end, 50)
+    end
+    return bufnr, winnr
   end
 end
 

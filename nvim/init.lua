@@ -481,3 +481,14 @@ end, 200)
 -- 7) AI INTEGRATION (OpenCode + Claude Code)
 -- ============================================
 require("config.ia")
+
+-- ============================================
+-- 8) FILETYPE OVERRIDES
+-- ============================================
+-- Treat Tailwind CSS files as scss so @tailwind/@apply directives get highlighted
+vim.filetype.add({
+    pattern = {
+        [".*tailwind.*%.css"] = "scss",
+        [".*%.css"]           = "css",
+    },
+})
