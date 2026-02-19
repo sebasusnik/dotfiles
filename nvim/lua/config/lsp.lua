@@ -10,8 +10,44 @@ local cmpcfg = require("config.cmp")
 mason.setup()
 
 mason_lspconfig.setup({
-  ensure_installed = { "biome", "eslint" }
+  ensure_installed = { "biome", "eslint", "lua_ls", "tailwindcss" }
 })
+
+-- Tailwind LSP (with cn/cva/clsx support for shadcn/ui)
+vim.lsp.config("tailwindcss", {
+  capabilities = cmpcfg.capabilities,
+  settings = {
+    tailwindCSS = {
+      experimental = {
+        classRegex = {
+          { "cn\\(([^)]*)\\)",      "[\"'`]([^\"'`]*).*?[\"'`]" },
+          { "cva\\(([^)]*)\\)",     "[\"'`]([^\"'`]*).*?[\"'`]" },
+          { "cx\\(([^)]*)\\)",      "[\"'`]([^\"'`]*).*?[\"'`]" },
+          { "clsx\\(([^)]*)\\)",    "[\"'`]([^\"'`]*).*?[\"'`]" },
+          { "twMerge\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
+        },
+      },
+    },
+  },
+})
+vim.lsp.enable("tailwindcss")
+
+-- lua_ls: Neovim config aware
+vim.lsp.config("lua_ls", {
+  capabilities = cmpcfg.capabilities,
+  settings = {
+    Lua = {
+      runtime = { version = "LuaJIT" },
+      workspace = {
+        checkThirdParty = false,
+        library = { vim.env.VIMRUNTIME },
+      },
+      diagnostics = { globals = { "vim" } },
+      telemetry = { enable = false },
+    },
+  },
+})
+vim.lsp.enable("lua_ls")
 
 -- ⚠️ IMPORTANTE:
 -- Desactivamos eslint por defecto.

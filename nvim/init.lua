@@ -35,7 +35,7 @@ local function _refresh_git()
 end
 vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "BufWritePost" }, { callback = _refresh_git })
 
--- Dynamic winbar: hidden for non-editor panels, re-evaluated on every render
+-- Dynamic winbar: filename + line count + diagnostics (per-window)
 local _no_winbar_ft = { "neo-tree", "lazy", "mason", "help", "qf", "TelescopePrompt" }
 _G._winbar = function()
     if vim.bo.buftype ~= "" then return "" end
@@ -172,6 +172,7 @@ require("lazy").setup({
     { "hrsh7th/cmp-nvim-lsp" },
     { "hrsh7th/cmp-path" },
     { "hrsh7th/cmp-buffer" },
+    { "hrsh7th/cmp-cmdline" },
     { "L3MON4D3/LuaSnip" },
     { "saadparwaiz1/cmp_luasnip" },
     { "rafamadriz/friendly-snippets" },
@@ -304,6 +305,56 @@ require("lazy").setup({
             "nvim-cmp",
         },
         config = function() require("config.minuet") end,
+    },
+
+    -- ======================
+    -- Colorizer (inline color preview)
+    -- ======================
+    {
+        "norcalli/nvim-colorizer.lua",
+        event = "BufReadPre",
+        config = function()
+            require("colorizer").setup({ "*" }, {
+                RGB = true, RRGGBB = true, names = false, css = true,
+            })
+        end,
+    },
+
+    -- ======================
+    -- Tailwind color swatches in cmp
+    -- ======================
+    { "roobert/tailwindcss-colorizer-cmp.nvim" },
+
+    -- ======================
+    -- Spectre (project search & replace)
+    -- ======================
+    {
+        "nvim-pack/nvim-spectre",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        keys = {
+            { "<leader>sr", function() require("spectre").open() end,                            desc = "Search & replace" },
+            { "<leader>sw", function() require("spectre").open_visual({ select_word = true }) end, desc = "Search word" },
+        },
+        config = function()
+            require("spectre").setup()
+        end,
+    },
+
+    -- ======================
+    -- Better escape (jk → Esc)
+    -- ======================
+    {
+        "max397574/better-escape.nvim",
+        event = "InsertEnter",
+        config = function()
+            require("better_escape").setup({
+                default_mappings = false,
+                mappings = {
+                    i = { j = { k = "<Esc>" } },
+                    v = { j = { k = "<Esc>" } },
+                },
+            })
+        end,
     },
 
     -- ======================

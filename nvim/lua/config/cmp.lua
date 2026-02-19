@@ -4,7 +4,12 @@ local luasnip = require("luasnip")
 -- snippets “tipo VSCode” (React/TS/etc)
 require("luasnip.loaders.from_vscode").lazy_load()
 
+local tw_colorizer = require("tailwindcss-colorizer-cmp")
+
 cmp.setup({
+  formatting = {
+    format = tw_colorizer.formatter,
+  },
   snippet = {
     expand = function(args)
       luasnip.lsp_expand(args.body)
@@ -41,6 +46,19 @@ cmp.setup({
     { name = "path" },
     { name = "buffer", keyword_length = 3 },
   },
+})
+
+-- Cmdline autocomplete (: commands and / search)
+cmp.setup.cmdline(":", {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = cmp.config.sources(
+    { { name = "path" } },
+    { { name = "cmdline" } }
+  ),
+})
+cmp.setup.cmdline("/", {
+  mapping = cmp.mapping.preset.cmdline(),
+  sources = { { name = "buffer" } },
 })
 
 -- Exportamos capabilities para LSP

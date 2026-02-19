@@ -30,6 +30,9 @@ require("which-key").add({
   { "<leader>d",        group = "Diagnostics",   icon = { icon = "󰒡", color = "red" } },
   { "<leader>dl",       desc = "Trouble (project)", icon = { icon = "󰝤", color = "red" } },
   { "<leader>dL",       desc = "Trouble (buffer)",  icon = { icon = "󰝤", color = "orange" } },
+  { "<leader>s",        group = "Search/Replace", icon = { icon = "󰛔", color = "blue" } },
+  { "<leader>sr",       desc = "Search & replace (Spectre)", icon = { icon = "󰛔", color = "blue" } },
+  { "<leader>sw",       desc = "Search word (Spectre)",      icon = { icon = "󰛔", color = "blue" } },
   { "<leader>w",        group = "Window/Splits", icon = { icon = "󰕮", color = "grey" } },
   { "<leader>x",        group = "Session",       icon = { icon = "󰆓", color = "cyan" } },
   -- Standalone
