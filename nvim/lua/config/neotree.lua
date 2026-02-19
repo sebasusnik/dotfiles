@@ -36,7 +36,8 @@ require("neo-tree").setup({
       hide_gitignored = false,
     },
     follow_current_file = {
-      enabled = false,
+      enabled = true,
+      leave_dirs_open = true,
     },
     group_empty_dirs = false,
     use_libuv_file_watcher = false,
@@ -91,6 +92,9 @@ require("neo-tree").setup({
 })
 
 -- Keymaps
-vim.keymap.set("n", "<leader>e", ":Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
+vim.keymap.set("n", "<leader>e", ":Neotree reveal toggle<CR>", { desc = "Toggle Neo-tree" })
 vim.keymap.set("n", "-", ":Neotree reveal<CR>", { desc = "Reveal in Neo-tree" })
-vim.keymap.set("n", "<leader>o", ":Neotree focus<CR>", { desc = "Focus Neo-tree" })
+vim.keymap.set("n", "<leader>o", ":Neotree reveal focus<CR>", { desc = "Focus Neo-tree" })
+
+-- Current file highlight
+vim.api.nvim_set_hl(0, "NeoTreeCursorLine", { bg = "#2a2a3a" })
