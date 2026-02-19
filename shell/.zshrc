@@ -132,35 +132,53 @@ dev() {
 
     # Determinar qué AI usar según el parámetro
     case "${1:-opencode}" in
-        claude|cc)
-            ai_cmd="claude"
-            ;;
-        opencode|open|oc)
-            ai_cmd="opencode"
-            ;;
-        *)
-            ai_cmd="opencode"
-            ;;
+        claude|cc)        ai_cmd="claude" ;;
+        opencode|open|oc) ai_cmd="opencode" ;;
     esac
 
-    echo "🚀 Iniciando dev session con $ai_cmd..."
+    # Session name per project, derived from current directory
+    local session_name
+    session_name="dev-$(basename "$PWD" | tr -cs 'a-zA-Z0-9' '-' | sed 's/-$//')"
 
-    tmux kill-session -t dev 2>/dev/null
-    tmux new-session -d -s dev \; \
-        send-keys "nvim ." C-m \; \
-        split-window -h -p 40 \; \
-        send-keys "$ai_cmd" C-m \; \
-        select-pane -t 0 \; \
-        split-window -v -p 30 \; \
-        select-pane -t 0 \; \
-        attach
+    if ! tmux has-session -t "$session_name" 2>/dev/null; then
+        echo "🚀 Iniciando dev session '$session_name' con $ai_cmd..."
+        tmux new-session -d -s "$session_name" \; \
+            send-keys "nvim ." C-m \; \
+            split-window -h -p 40 \; \
+            send-keys "$ai_cmd" C-m \; \
+            select-pane -t 0 \; \
+            split-window -v -p 30 \; \
+            select-pane -t 0
+    else
+        echo "📎 Volviendo a sesión existente '$session_name'..."
+    fi
+
+    # Use switch-client when inside tmux to avoid nesting
+    if [ -n "$TMUX" ]; then
+        tmux switch-client -t "$session_name"
+    else
+        tmux attach-session -t "$session_name"
+    fi
 }
 
-# Re-attach a sesión existente (útil si solo cerraste la ventana)
-alias dev-attach='tmux attach -t dev'
+# Re-attach to this project's session
+dev-attach() {
+    local session_name
+    session_name="dev-$(basename "$PWD" | tr -cs 'a-zA-Z0-9' '-' | sed 's/-$//')"
+    if [ -n "$TMUX" ]; then
+        tmux switch-client -t "$session_name" 2>/dev/null || echo "No hay sesión dev para '$(basename "$PWD")'"
+    else
+        tmux attach -t "$session_name" 2>/dev/null || echo "No hay sesión dev para '$(basename "$PWD")'"
+    fi
+}
 
-# Matar sesión manualmente
-alias dev-kill='tmux kill-session -t dev 2>/dev/null; echo "✓ Sesión dev cerrada"'
+# Kill this project's session
+dev-kill() {
+    local session_name
+    session_name="dev-$(basename "$PWD" | tr -cs 'a-zA-Z0-9' '-' | sed 's/-$//')"
+    tmux kill-session -t "$session_name" 2>/dev/null
+    echo "✓ Sesión '$session_name' cerrada"
+}
 
 # Ver sesiones activas
 alias dev-ls='tmux ls 2>/dev/null || echo "No hay sesiones tmux"'
