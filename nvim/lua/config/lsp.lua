@@ -19,23 +19,26 @@ mason_lspconfig.setup({
 vim.lsp.enable("eslint", false)
 
 -- ============================================================
--- Keymaps comunes
+-- Keymaps comunes — aplican a TODOS los LSP via LspAttach
 -- ============================================================
 
-local function common_on_attach(_, bufnr)
-  local nmap = function(keys, fn, desc)
-    vim.keymap.set("n", keys, fn, { buffer = bufnr, desc = desc })
-  end
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function(args)
+    local bufnr = args.buf
+    local nmap = function(keys, fn, desc)
+      vim.keymap.set("n", keys, fn, { buffer = bufnr, desc = desc })
+    end
 
-  nmap("gd", vim.lsp.buf.definition, "Go to definition")
-  nmap("K", vim.lsp.buf.hover, "Hover")
-  nmap("<leader>rn", vim.lsp.buf.rename, "Rename")
-  nmap("<leader>ca", vim.lsp.buf.code_action, "Code actions")
+    nmap("gd", vim.lsp.buf.definition, "Go to definition")
+    nmap("K", vim.lsp.buf.hover, "Hover")
+    nmap("<leader>rn", vim.lsp.buf.rename, "Rename")
+    nmap("<leader>ca", vim.lsp.buf.code_action, "Code actions")
 
-  nmap("<leader>d", vim.diagnostic.open_float, "Diagnostics")
-  nmap("[d", vim.diagnostic.goto_prev, "Prev diagnostic")
-  nmap("]d", vim.diagnostic.goto_next, "Next diagnostic")
-end
+    nmap("<leader>d", vim.diagnostic.open_float, "Diagnostics")
+    nmap("[d", vim.diagnostic.goto_prev, "Prev diagnostic")
+    nmap("]d", vim.diagnostic.goto_next, "Next diagnostic")
+  end,
+})
 
 -- ============================================================
 -- Biome / ESLint (mutuamente excluyentes)
@@ -52,7 +55,6 @@ end
 local function enable_server(server_name)
   vim.lsp.config(server_name, {
     capabilities = cmpcfg.capabilities,
-    on_attach = common_on_attach,
     settings = server_name == "eslint" and { format = false } or nil,
   })
 

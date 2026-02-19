@@ -160,16 +160,6 @@ require("lazy").setup({
         config = function()
             require("typescript-tools").setup({
                 capabilities = require("config.cmp").capabilities,
-                on_attach = function(_, bufnr)
-                    local nmap = function(keys, fn, desc)
-                        vim.keymap.set("n", keys, fn, { buffer = bufnr, desc = desc })
-                    end
-
-                    nmap("gd", vim.lsp.buf.definition, "Go to definition")
-                    nmap("K", vim.lsp.buf.hover, "Hover")
-                    nmap("<leader>rn", vim.lsp.buf.rename, "Rename")
-                    nmap("<leader>ca", vim.lsp.buf.code_action, "Code actions")
-                end,
             })
         end,
     },
@@ -354,6 +344,60 @@ require("lazy").setup({
         "folke/persistence.nvim",
         lazy = false,
         config = function() require("config.session") end,
+    },
+
+    -- ======================
+    -- Fidget (LSP progress indicator)
+    -- ======================
+    {
+        "j-hui/fidget.nvim",
+        event = "LspAttach",
+        config = function()
+            require("fidget").setup({
+                notification = { window = { winblend = 0 } },
+            })
+        end,
+    },
+
+    -- ======================
+    -- Trouble (diagnostics list)
+    -- ======================
+    {
+        "folke/trouble.nvim",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        cmd = "Trouble",
+        config = function()
+            require("trouble").setup({ use_diagnostic_signs = true })
+            vim.keymap.set("n", "<leader>dl", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Trouble (project)" })
+            vim.keymap.set("n", "<leader>dL", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Trouble (buffer)" })
+        end,
+    },
+
+    -- ======================
+    -- Lazygit
+    -- ======================
+    {
+        "kdheepak/lazygit.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        cmd = "LazyGit",
+        config = function()
+            vim.keymap.set("n", "<leader>gg", "<cmd>LazyGit<cr>", { desc = "LazyGit" })
+        end,
+    },
+
+    -- ======================
+    -- Indent guides
+    -- ======================
+    {
+        "lukas-reineke/indent-blankline.nvim",
+        event = "BufReadPre",
+        main = "ibl",
+        config = function()
+            require("ibl").setup({
+                indent = { char = "│", highlight = "IblIndent" },
+                scope  = { enabled = true, highlight = "IblScope", show_start = false, show_end = false },
+            })
+        end,
     },
 
 })

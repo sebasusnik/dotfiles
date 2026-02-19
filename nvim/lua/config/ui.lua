@@ -102,11 +102,18 @@ local function transparent()
   vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "NONE" })
   vim.api.nvim_set_hl(0, "MsgArea",     { bg = "NONE" })
 
-  -- Line numbers
-  vim.api.nvim_set_hl(0, "LineNr",       { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "LineNrAbove",  { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "LineNrBelow",  { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "CursorLineNr", { bg = "NONE", bold = true })
+  -- Line numbers (subtle, current line slightly brighter)
+  vim.api.nvim_set_hl(0, "LineNr",       { bg = "NONE", fg = "#555555" })
+  vim.api.nvim_set_hl(0, "LineNrAbove",  { bg = "NONE", fg = "#555555" })
+  vim.api.nvim_set_hl(0, "LineNrBelow",  { bg = "NONE", fg = "#555555" })
+  vim.api.nvim_set_hl(0, "CursorLineNr", { bg = "NONE", fg = "#888888", bold = false })
+
+  -- Indent guides (faint line, current scope slightly brighter)
+  vim.api.nvim_set_hl(0, "IblIndent", { fg = "#303030", nocombine = true })
+  vim.api.nvim_set_hl(0, "IblScope",  { fg = "#505050", nocombine = true })
+
+  -- Trailing whitespace
+  vim.api.nvim_set_hl(0, "TrailingWhitespace", { bg = "#3d2020" })
 
   -- Floating windows
   vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
@@ -173,3 +180,6 @@ end
 
 set_diagnostics_hl()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = set_diagnostics_hl })
+
+-- Trailing whitespace highlight
+vim.fn.matchadd("TrailingWhitespace", [[\s\+$]])

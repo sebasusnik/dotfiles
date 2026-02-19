@@ -28,9 +28,12 @@ require("which-key").add({
   { "<leader>r",        group = "Refactor",      icon = { icon = "󰑕", color = "yellow" } },
   { "<leader>c",        group = "Code",          icon = { icon = "󰅱", color = "azure" } },
   { "<leader>d",        group = "Diagnostics",   icon = { icon = "󰒡", color = "red" } },
+  { "<leader>dl",       desc = "Trouble (project)", icon = { icon = "󰝤", color = "red" } },
+  { "<leader>dL",       desc = "Trouble (buffer)",  icon = { icon = "󰝤", color = "orange" } },
   { "<leader>w",        group = "Window/Splits", icon = { icon = "󰕮", color = "grey" } },
   { "<leader>x",        group = "Session",       icon = { icon = "󰆓", color = "cyan" } },
   -- Standalone
+  { "<leader>gg",       desc = "LazyGit",                icon = { icon = "", color = "orange" } },
   { "<leader>e",        desc = "Toggle Neo-tree",        icon = { icon = "󰙅", color = "green" } },
   { "<leader>z",        desc = "Zen Mode",               icon = { icon = "󱅻", color = "grey" } },
   { "<leader>q",        desc = "Close file",             icon = { icon = "󰅖", color = "red" } },
