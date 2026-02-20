@@ -151,7 +151,7 @@ echo ""
 
 # Lista de dependencias a verificar (node se llama nodejs en apt)
 if [ "$OS" = "macos" ]; then
-    DEPS_TO_CHECK=("nvim:neovim" "tmux:tmux" "rg:ripgrep" "node:node" "git:git")
+    DEPS_TO_CHECK=("nvim:neovim" "tmux:tmux" "rg:ripgrep" "node:node" "git:git" "luarocks:luarocks" "magick:imagemagick")
 else
     DEPS_TO_CHECK=("nvim:neovim" "tmux:tmux" "rg:ripgrep" "node:nodejs" "git:git")
 fi
