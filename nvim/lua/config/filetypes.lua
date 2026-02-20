@@ -11,7 +11,7 @@ vim.filetype.add({
     },
 })
 
--- SVG: interceptar apertura antes de leer el archivo y abrir directo en Chrome
+-- SVG: wrapper HTML para ajustar al viewport
 local function open_svg_in_browser(file)
     local tmp = vim.fn.tempname() .. ".html"
     local filename = vim.fn.fnamemodify(file, ":t")
@@ -36,12 +36,25 @@ local function open_svg_in_browser(file)
     end
 end
 
+-- Imágenes raster: abrir directo en Chrome
+local function open_image_in_browser(file)
+    vim.fn.jobstart({ "open", "-a", "Google Chrome", file })
+end
+
 vim.api.nvim_create_autocmd("BufReadCmd", {
     pattern = "*.svg",
     callback = function(ev)
-        local file = vim.fn.fnamemodify(ev.match, ":p")
-        open_svg_in_browser(file)
+        open_svg_in_browser(vim.fn.fnamemodify(ev.match, ":p"))
         vim.schedule(function() vim.cmd("bd!") end)
     end,
-    desc = "Abrir SVG en Chrome sin cargar en Neovim",
+    desc = "Abrir SVG en Chrome (ajustado al viewport)",
+})
+
+vim.api.nvim_create_autocmd("BufReadCmd", {
+    pattern = { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.avif" },
+    callback = function(ev)
+        open_image_in_browser(vim.fn.fnamemodify(ev.match, ":p"))
+        vim.schedule(function() vim.cmd("bd!") end)
+    end,
+    desc = "Abrir imágenes en Chrome sin cargar en Neovim",
 })

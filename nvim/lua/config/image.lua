@@ -17,5 +17,7 @@ require("image").setup({
     },
     max_width_window_percentage = 80,
     max_height_window_percentage = 50,
-    hijack_file_patterns = { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.avif" },
+    -- hijack deshabilitado: causa race condition al abrir desde neo-tree
+    -- los archivos de imagen se abren en Chrome via config/filetypes.lua
+    hijack_file_patterns = {},
 })
