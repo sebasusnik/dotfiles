@@ -57,9 +57,9 @@ require("lazy").setup({
         cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle" },
         ft = { "markdown" },
         build = function() vim.fn["mkdp#util#install"]() end,
-        config = function()
-            vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", { desc = "Markdown preview" })
-        end,
+        keys = {
+            { "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", desc = "Markdown preview" },
+        },
     },
     {
         "3rd/image.nvim",
