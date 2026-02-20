@@ -14,6 +14,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+BACKUP_TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
 # Obtener el directorio donde está el script
 DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -46,10 +47,10 @@ create_symlink() {
     local source=$1
     local target=$2
 
-    # Si el target existe y no es un symlink, hacer backup
+    # Si el target existe y no es un symlink, hacer backup con timestamp
     if [ -e "$target" ] && [ ! -L "$target" ]; then
-        echo -e "${YELLOW}⚠️  Backup: $target -> $target.backup${NC}"
-        mv "$target" "$target.backup"
+        echo -e "${YELLOW}⚠️  Backup: $target -> $target.backup.$BACKUP_TIMESTAMP${NC}"
+        mv "$target" "$target.backup.$BACKUP_TIMESTAMP"
     fi
 
     # Si ya existe el symlink, eliminarlo
@@ -61,6 +62,86 @@ create_symlink() {
     ln -sf "$source" "$target"
     echo -e "${GREEN}✓${NC} Linked: $source -> $target"
 }
+
+# ============================================
+# Restaurar desde backups
+# ============================================
+restore_backups() {
+    echo "🔄 Restaurando configuraciones desde backups..."
+    echo ""
+
+    local targets=(
+        "$HOME/.config/nvim"
+        "$HOME/.tmux.conf"
+        "$HOME/.zshrc"
+        "$HOME/.config/ohmyposh"
+        "$HOME/.gitconfig"
+    )
+
+    if [ "$OS" = "macos" ]; then
+        targets+=("$HOME/Library/Application Support/com.mitchellh.ghostty/config")
+    elif [ "$OS" = "linux" ]; then
+        targets+=("$HOME/.config/ghostty/config")
+    fi
+
+    local found=0
+
+    # Primera pasada: mostrar qué se va a restaurar
+    for target in "${targets[@]}"; do
+        local dir base latest
+        dir="$(dirname "$target")"
+        base="$(basename "$target")"
+        latest=$(find "$dir" -maxdepth 1 -name "${base}.backup.*" 2>/dev/null | sort | tail -1)
+        if [ -n "$latest" ]; then
+            echo -e "${BLUE}Backup encontrado:${NC} $latest"
+            found=$((found + 1))
+        fi
+    done
+
+    if [ "$found" -eq 0 ]; then
+        echo -e "${YELLOW}⚠️  No se encontraron backups para restaurar${NC}"
+        exit 0
+    fi
+
+    echo ""
+    read -p "¿Restaurar estos backups? (y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Cancelado."
+        exit 0
+    fi
+
+    echo ""
+    # Segunda pasada: restaurar
+    for target in "${targets[@]}"; do
+        local dir base latest
+        dir="$(dirname "$target")"
+        base="$(basename "$target")"
+        latest=$(find "$dir" -maxdepth 1 -name "${base}.backup.*" 2>/dev/null | sort | tail -1)
+        if [ -n "$latest" ]; then
+            if [ -L "$target" ]; then
+                rm "$target"
+            elif [ -e "$target" ]; then
+                echo -e "${YELLOW}⚠️  $target existe y no es symlink, omitiendo${NC}"
+                continue
+            fi
+            mv "$latest" "$target"
+            echo -e "${GREEN}✓${NC} Restaurado: $(basename "$latest") -> $target"
+        fi
+    done
+
+    echo ""
+    echo -e "${GREEN}🎉 Restauración completada${NC}"
+    echo "Reinicia tu terminal o ejecuta: source ~/.zshrc"
+}
+
+# Parse argumentos
+for arg in "$@"; do
+    if [ "$arg" = "--restore" ]; then
+        restore_backups
+        exit 0
+    fi
+done
 
 # ============================================
 # Instalar dependencias
