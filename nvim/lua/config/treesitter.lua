@@ -19,7 +19,7 @@ require("nvim-treesitter").install({
   "javascript", "typescript", "tsx", "jsx",
   "html", "css", "scss",
   -- Data formats
-  "json", "jsonc", "yaml", "toml", "xml",
+  "json", "yaml", "toml", "xml",
   -- Documentation
   "markdown", "markdown_inline",
   -- Shell/Config

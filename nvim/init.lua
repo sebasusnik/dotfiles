@@ -28,6 +28,7 @@ vim.opt.rtp:prepend(lazypath)
 -- 3) PLUGINS
 -- ============================================
 require("lazy").setup({
+    rocks = { hererocks = false }, -- usar luarocks del sistema (brew install luarocks)
 
     -- ======================
     -- Navegación / archivos
