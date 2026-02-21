@@ -64,6 +64,7 @@ require("lazy").setup({
     },
     {
         "3rd/image.nvim",
+        ft = { "markdown" }, -- solo se usa para imágenes inline en markdown
         build = "luarocks --lua-version=5.1 install magick",
         config = function() require("config.image") end,
     },
@@ -71,7 +72,10 @@ require("lazy").setup({
     -- ======================
     -- LSP / Tooling
     -- ======================
-    { "williamboman/mason.nvim" },
+    {
+        "williamboman/mason.nvim",
+        cmd = { "Mason", "MasonInstall", "MasonUpdate", "MasonUninstall" },
+    },
     { "williamboman/mason-lspconfig.nvim" },
     { "neovim/nvim-lspconfig" },
     {
@@ -107,23 +111,23 @@ require("lazy").setup({
     -- ======================
     -- UI
     -- ======================
-    { "nvim-tree/nvim-web-devicons" },
+    { "nvim-tree/nvim-web-devicons", lazy = true },
     {
         "zaldih/themery.nvim",
         config = function() require("config.themery") end,
     },
-    { "catppuccin/nvim",                  name = "catppuccin" },
-    { "rose-pine/neovim",                 name = "rose-pine" },
-    { "folke/tokyonight.nvim" },
-    { "rebelot/kanagawa.nvim" },
-    { "EdenEast/nightfox.nvim" },
-    { "ellisonleao/gruvbox.nvim" },
-    { "Mofiqul/dracula.nvim" },
-    { "navarasu/onedark.nvim" },
-    { "sainnhe/everforest" },
-    { "projekt0n/github-nvim-theme" },
-    { "bluz71/vim-moonfly-colors",        name = "moonfly" },
-    { "nyoom-engineering/oxocarbon.nvim" },
+    { "catppuccin/nvim",                  name = "catppuccin",  lazy = true },
+    { "rose-pine/neovim",                 name = "rose-pine",   lazy = true },
+    { "folke/tokyonight.nvim",            lazy = true },
+    { "rebelot/kanagawa.nvim",            lazy = true },
+    { "EdenEast/nightfox.nvim",           lazy = true },
+    { "ellisonleao/gruvbox.nvim",         lazy = true },
+    { "Mofiqul/dracula.nvim",             lazy = true },
+    { "navarasu/onedark.nvim",            lazy = true },
+    { "sainnhe/everforest",               lazy = true },
+    { "projekt0n/github-nvim-theme",      lazy = true },
+    { "bluz71/vim-moonfly-colors",        name = "moonfly",     lazy = true },
+    { "nyoom-engineering/oxocarbon.nvim", lazy = true },
 
     -- ======================
     -- Treesitter
@@ -174,14 +178,18 @@ require("lazy").setup({
     -- ======================
     -- Git
     -- ======================
-    { "lewis6991/gitsigns.nvim" },
+    {
+        "lewis6991/gitsigns.nvim",
+        event = "BufReadPre",
+        config = function() require("config.gitsigns") end,
+    },
     {
         "kdheepak/lazygit.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
         cmd = "LazyGit",
-        config = function()
-            vim.keymap.set("n", "<leader>gg", "<cmd>LazyGit<cr>", { desc = "LazyGit" })
-        end,
+        keys = {
+            { "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
+        },
     },
 
     -- ======================
@@ -191,7 +199,7 @@ require("lazy").setup({
         "nvim-pack/nvim-spectre",
         dependencies = { "nvim-lua/plenary.nvim" },
         keys = {
-            { "<leader>sr", function() require("spectre").open() end,                             desc = "Search & replace" },
+            { "<leader>sr", function() require("spectre").open() end,                              desc = "Search & replace" },
             { "<leader>sw", function() require("spectre").open_visual({ select_word = true }) end, desc = "Search word" },
         },
         config = function() require("spectre").setup() end,
@@ -216,7 +224,7 @@ require("lazy").setup({
             require("colorizer").setup({ "*" }, { RGB = true, RRGGBB = true, names = false, css = true })
         end,
     },
-    { "roobert/tailwindcss-colorizer-cmp.nvim" },
+    { "roobert/tailwindcss-colorizer-cmp.nvim", event = "InsertEnter" },
     {
         "lukas-reineke/indent-blankline.nvim",
         event = "BufReadPre",
@@ -227,10 +235,12 @@ require("lazy").setup({
         "folke/trouble.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         cmd = "Trouble",
+        keys = {
+            { "<leader>dl", "<cmd>Trouble diagnostics toggle<cr>",             desc = "Trouble (project)" },
+            { "<leader>dL", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Trouble (buffer)" },
+        },
         config = function()
             require("trouble").setup({ use_diagnostic_signs = true })
-            vim.keymap.set("n", "<leader>dl", "<cmd>Trouble diagnostics toggle<cr>",             { desc = "Trouble (project)" })
-            vim.keymap.set("n", "<leader>dL", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Trouble (buffer)" })
         end,
     },
     {
@@ -244,10 +254,19 @@ require("lazy").setup({
     -- ======================
     -- UI extras
     -- ======================
-    { "petertriho/nvim-scrollbar" },
-    { "folke/zen-mode.nvim" },
+    {
+        "petertriho/nvim-scrollbar",
+        event = "BufReadPre",
+        config = function() require("config.scrollbar") end,
+    },
+    {
+        "folke/zen-mode.nvim",
+        cmd = "ZenMode",
+        config = function() require("config.zen") end,
+    },
     {
         "nvimtools/hydra.nvim",
+        event = "VeryLazy",
         config = function() require("config.hydra") end,
     },
     {
@@ -291,9 +310,6 @@ require("config.formatting")
 require("config.lint")
 require("config.snippets")
 require("config.ui")
-require("config.gitsigns")
-require("config.scrollbar")
-require("config.zen")
 require("config.ia")
 require("config.filetypes")
 
