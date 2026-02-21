@@ -270,7 +270,7 @@ vim.keymap.set("n", "<leader>af", function()
 end, { desc = "Enviar función/type a AI" })
 
 -- Enviar type/interface/enum donde está el cursor
-vim.keymap.set("n", "<leader>at", function()
+vim.keymap.set("n", "<leader>ay", function()
   local filepath = get_relative_path()
   local node = get_type_node_at_cursor(0)
 
@@ -332,7 +332,7 @@ vim.keymap.set('n', '<leader>*', function()
 end, { desc = 'Buscar palabra' })
 
 -- Enviar cambios git del archivo actual
-vim.keymap.set('n', '<leader>ad', function()
+vim.keymap.set('n', '<leader>ag', function()
   local file = vim.fn.expand('%')
   local diff = vim.fn.system('git diff ' .. file)
   if diff == '' then
