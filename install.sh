@@ -168,14 +168,21 @@ for dep in "${DEPS_TO_CHECK[@]}"; do
     fi
 done
 
-# Función para instalar neovim en Linux (apt tiene versión 0.7 obsoleta)
+# Función para instalar neovim en Linux
+# - Arch/pacman: repo oficial tiene versión actualizada
+# - apt: repo tiene versión obsoleta (0.7), se usa snap
 install_neovim_linux() {
-    echo "📦 Instalando Neovim via snap (versión actual)..."
-    if ! command -v snap &>/dev/null; then
-        echo "Instalando snapd primero..."
-        sudo apt install -y snapd
+    if command -v pacman &>/dev/null; then
+        echo "📦 Instalando Neovim via pacman..."
+        sudo pacman -S --needed --noconfirm neovim
+    else
+        echo "📦 Instalando Neovim via snap (versión actual)..."
+        if ! command -v snap &>/dev/null; then
+            echo "Instalando snapd primero..."
+            sudo apt install -y snapd
+        fi
+        sudo snap install nvim --classic
     fi
-    sudo snap install nvim --classic
 }
 
 # Verificar dependencias opcionales de macOS
