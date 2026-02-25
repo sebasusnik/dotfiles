@@ -32,8 +32,13 @@ require("neo-tree").setup({
   },
   filesystem = {
     filtered_items = {
+      visible = true,          -- Mostrar items filtrados, pero con estilo "apagado"
       hide_dotfiles = false,
-      hide_gitignored = false,
+      hide_gitignored = true,  -- Gitignored aparece dimmed (no oculto)
+      hide_by_name = {
+        "node_modules",
+        ".git",
+      },
     },
     follow_current_file = {
       enabled = true,
@@ -98,3 +103,6 @@ vim.keymap.set("n", "<leader>o", ":Neotree reveal focus<CR>", { desc = "Focus Ne
 
 -- Current file highlight
 vim.api.nvim_set_hl(0, "NeoTreeCursorLine", { bg = "#2a2a3a" })
+
+-- Archivos/carpetas filtrados (gitignored, node_modules, etc.) aparecen apagados
+vim.api.nvim_set_hl(0, "NeoTreeDimText", { fg = "#4a4a5a", italic = true })

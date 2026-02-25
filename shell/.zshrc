@@ -137,12 +137,13 @@ dev() {
     esac
 
     # Session name per project, derived from current directory
-    local session_name
-    session_name="dev-$(basename "$PWD" | tr -cs 'a-zA-Z0-9' '-' | sed 's/-$//')"
+    local project_name session_name
+    project_name="$(basename "$PWD" | tr -cs 'a-zA-Z0-9' '-' | sed 's/-$//')"
+    session_name="dev-$project_name"
 
     if ! tmux has-session -t "$session_name" 2>/dev/null; then
         echo "🚀 Iniciando dev session '$session_name' con $ai_cmd..."
-        tmux new-session -d -s "$session_name" \; \
+        tmux new-session -d -s "$session_name" -n "$project_name" \; \
             send-keys "nvim ." C-m \; \
             split-window -h -p 40 \; \
             send-keys "$ai_cmd" C-m \; \
@@ -153,22 +154,28 @@ dev() {
         echo "📎 Volviendo a sesión existente '$session_name'..."
     fi
 
+    # Store project name as session variable (tmux set-titles will use it)
+    tmux set-option -t "$session_name" @project_name "$project_name"
+
     # Use switch-client when inside tmux to avoid nesting
     if [ -n "$TMUX" ]; then
         tmux switch-client -t "$session_name"
     else
+        # Set Ghostty title immediately (before tmux's set-titles kicks in)
+        printf '\033]2;%s\a' "$project_name"
         tmux attach-session -t "$session_name"
     fi
 }
 
 # Re-attach to this project's session
 dev-attach() {
-    local session_name
-    session_name="dev-$(basename "$PWD" | tr -cs 'a-zA-Z0-9' '-' | sed 's/-$//')"
+    local project_name session_name
+    project_name="$(basename "$PWD" | tr -cs 'a-zA-Z0-9' '-' | sed 's/-$//')"
+    session_name="dev-$project_name"
     if [ -n "$TMUX" ]; then
-        tmux switch-client -t "$session_name" 2>/dev/null || echo "No hay sesión dev para '$(basename "$PWD")'"
+        tmux switch-client -t "$session_name" 2>/dev/null || { echo "No hay sesión dev para '$(basename "$PWD")'"; return 1; }
     else
-        tmux attach -t "$session_name" 2>/dev/null || echo "No hay sesión dev para '$(basename "$PWD")'"
+        tmux attach -t "$session_name" 2>/dev/null || { echo "No hay sesión dev para '$(basename "$PWD")'"; return 1; }
     fi
 }
 
