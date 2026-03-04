@@ -1,6 +1,24 @@
 local M = {}
 local uv = vim.uv or vim.loop
 
+-- Cache detection results per file to avoid repeated fs traversal.
+-- TTL is 10 seconds; invalidated on BufWritePost (package.json changes are rare).
+local _cache = {}
+local _cache_ts = {}
+local CACHE_TTL_MS = 10000
+
+local function cache_get(fname)
+  local ts = _cache_ts[fname]
+  if ts and (uv.hrtime() / 1e6 - ts) < CACHE_TTL_MS then
+    return _cache[fname]
+  end
+end
+
+local function cache_set(fname, result)
+  _cache[fname] = result
+  _cache_ts[fname] = uv.hrtime() / 1e6
+end
+
 local function exists(path)
   return type(path) == "string" and path ~= "" and uv.fs_stat(path) ~= nil
 end
@@ -118,6 +136,9 @@ function M.detect_by_path(input)
     return empty_result()
   end
 
+  local cached = cache_get(fname)
+  if cached then return cached end
+
   local file_dir = dirname(fname)
   if not file_dir then
     return empty_result()
@@ -146,7 +167,7 @@ function M.detect_by_path(input)
   local use_prettier = (not use_biome) and (prettier_path ~= nil)
   local use_eslint = (not use_biome) and (eslint_path ~= nil)
 
-  return {
+  local result = {
     ws_root = ws_root,
     pkg_root = pkg_root,
     root = pkg_root,
@@ -154,6 +175,9 @@ function M.detect_by_path(input)
     use_prettier = use_prettier,
     use_eslint = use_eslint,
   }
+
+  cache_set(fname, result)
+  return result
 end
 
 function M.detect(bufnr)
