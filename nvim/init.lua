@@ -136,6 +136,9 @@ require("lazy").setup({
         "nvim-treesitter/nvim-treesitter",
         branch = "main",
         build = ":TSUpdate",
+        -- Defer parser install check past startup; Neovim's built-in loader
+        -- handles the first FileType event via the pre-installed queries.
+        event = "BufReadPost",
         config = function() require("config.treesitter") end,
     },
     { "nvim-treesitter/nvim-treesitter-textobjects", branch = "main", event = "VeryLazy" },
@@ -305,7 +308,12 @@ require("lazy").setup({
 -- ============================================
 require("config.project_tools")
 require("config.cmp")
-require("config.lsp")
+-- Defer LSP setup to BufReadPre so mason-lspconfig.setup(), vim.lsp.config()
+-- and vim.lsp.enable() don't run during startup before any file is opened.
+vim.api.nvim_create_autocmd("BufReadPre", {
+    once = true,
+    callback = function() require("config.lsp") end,
+})
 require("config.formatting")
 require("config.lint")
 require("config.snippets")

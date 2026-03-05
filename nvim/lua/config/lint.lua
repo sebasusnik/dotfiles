@@ -33,8 +33,29 @@ local function run_lint(bufnr)
   lint.try_lint()
 end
 
-vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave", "TextChanged" }, {
-  callback = function(args)
-    run_lint(args.buf)
-  end,
+-- Debounce timer for TextChanged — avoids running the linter on every keystroke.
+local _timers = {}
+local function debounce_lint(bufnr)
+  if _timers[bufnr] then
+    _timers[bufnr]:stop()
+    _timers[bufnr]:close()
+  end
+  _timers[bufnr] = vim.uv.new_timer()
+  _timers[bufnr]:start(800, 0, vim.schedule_wrap(function()
+    if _timers[bufnr] then
+      _timers[bufnr]:close()
+      _timers[bufnr] = nil
+    end
+    if vim.api.nvim_buf_is_valid(bufnr) then
+      run_lint(bufnr)
+    end
+  end))
+end
+
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
+  callback = function(args) run_lint(args.buf) end,
+})
+
+vim.api.nvim_create_autocmd("TextChanged", {
+  callback = function(args) debounce_lint(args.buf) end,
 })

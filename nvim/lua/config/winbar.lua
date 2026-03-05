@@ -6,7 +6,12 @@
 -- Git state cache: updated async on BufEnter/FocusGained, zero render cost
 -- dirty = repo-wide (like oh-my-posh), ahead/behind vs remote
 local _git = { ahead = 0, behind = 0, dirty = false }
+local _git_last_refresh = 0
+local GIT_THROTTLE_MS = 5000
 local function _refresh_git()
+    local now = (vim.uv or vim.loop).hrtime() / 1e6
+    if (now - _git_last_refresh) < GIT_THROTTLE_MS then return end
+    _git_last_refresh = now
     vim.fn.jobstart("git rev-list --left-right --count HEAD...@{upstream} 2>/dev/null", {
         stdout_buffered = true,
         on_stdout = function(_, data)

@@ -88,7 +88,12 @@ local function stop_client(bufnr, name)
   end
 end
 
+-- Track which servers have been fully configured so we don't call
+-- vim.lsp.config() + vim.lsp.enable() on every JS/TS buffer open.
+local _server_initialized = {}
 local function enable_server(server_name)
+  if _server_initialized[server_name] then return end
+  _server_initialized[server_name] = true
   local cfg = { capabilities = cmpcfg.capabilities }
   if server_name == "eslint" then
     cfg.settings = { format = false }
