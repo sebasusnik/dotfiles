@@ -4,10 +4,14 @@
 -- New nvim-treesitter main branch API
 -- ============================================
 
--- Explicitly start treesitter for filetypes whose filetype name ≠ parser name
+-- En la rama main, nvim-treesitter NO activa el highlighting: hay que llamar
+-- vim.treesitter.start() por buffer. Sin esto, .ts/.js/.css/etc. quedaban con
+-- el syntax regex viejo (más lento y menos preciso).
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "typescriptreact", "javascriptreact" },
+  group = vim.api.nvim_create_augroup("TreesitterStart", { clear = true }),
   callback = function(ev)
+    if vim.b[ev.buf].bigfile then return end -- ver config/options.lua
+    -- pcall: falla si no hay parser instalado para el filetype
     pcall(vim.treesitter.start, ev.buf)
   end,
 })

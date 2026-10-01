@@ -96,13 +96,5 @@ require("neo-tree").setup({
   },
 })
 
--- Keymaps
-vim.keymap.set("n", "<leader>e", ":Neotree reveal toggle<CR>", { desc = "Toggle Neo-tree" })
-vim.keymap.set("n", "-", ":Neotree reveal<CR>", { desc = "Reveal in Neo-tree" })
-vim.keymap.set("n", "<leader>o", ":Neotree reveal focus<CR>", { desc = "Focus Neo-tree" })
-
--- Current file highlight
-vim.api.nvim_set_hl(0, "NeoTreeCursorLine", { bg = "#2a2a3a" })
-
--- Archivos/carpetas filtrados (gitignored, node_modules, etc.) aparecen apagados
-vim.api.nvim_set_hl(0, "NeoTreeDimText", { fg = "#4a4a5a", italic = true })
+-- Keymaps (<leader>e, -, <leader>o): definidos en init.lua (lazy keys)
+-- Colores (NeoTreeCursorLine, NeoTreeDimText): config/ui.lua

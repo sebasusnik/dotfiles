@@ -17,4 +17,5 @@ vim.keymap.set("n", "<leader>ws", "<C-w>s", { desc = "Split horizontal" })
 -- Navegación entre buffers
 vim.keymap.set("n", "<leader><leader>", "<C-^>", { desc = "Alternar últimos 2 archivos" })
 vim.keymap.set("n", "<leader>q", ":bd<CR>", { desc = "Cerrar archivo" })
-vim.keymap.set("n", "<leader>fx", ":!open %<CR>", { desc = "Abrir con app del sistema" })
+-- vim.ui.open: escapa bien paths con espacios (`:!open %` no)
+vim.keymap.set("n", "<leader>fx", function() vim.ui.open(vim.fn.expand("%:p")) end, { desc = "Abrir con app del sistema" })

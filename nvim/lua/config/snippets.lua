@@ -1,5 +1,8 @@
 local luasnip = require("luasnip")
 
+-- snippets “tipo VSCode” (React/TS/etc)
+require("luasnip.loaders.from_vscode").lazy_load()
+
 local s = luasnip.snippet
 local t = luasnip.text_node
 local i = luasnip.insert_node

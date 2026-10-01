@@ -20,7 +20,8 @@ vim.opt.sidescrolloff = 8
 vim.opt.termguicolors = true
 
 -- Comportamiento
-vim.opt.clipboard = "unnamedplus"
+-- schedule: detectar el provider del clipboard puede tardar en el arranque
+vim.schedule(function() vim.opt.clipboard = "unnamedplus" end)
 vim.opt.undofile = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
@@ -34,12 +35,13 @@ vim.api.nvim_create_autocmd("BufReadPre", {
     callback = function(ev)
         local ok, stat = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(ev.buf))
         if ok and stat and stat.size > 500 * 1024 then
+            vim.b[ev.buf].bigfile = true -- treesitter no arranca (config/treesitter.lua)
             vim.bo[ev.buf].swapfile = false
             vim.bo[ev.buf].undofile = false
-            vim.opt_local.foldmethod = "manual"
             vim.schedule(function()
-                pcall(vim.treesitter.stop, ev.buf)
-                vim.bo[ev.buf].syntax = "off"
+                if vim.api.nvim_buf_is_valid(ev.buf) then
+                    vim.bo[ev.buf].syntax = "off"
+                end
             end)
         end
     end,

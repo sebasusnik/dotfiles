@@ -1,7 +1,11 @@
 local mason = require("mason")
 local mason_lspconfig = require("mason-lspconfig")
 local tools = require("config.project_tools")
-local cmpcfg = require("config.cmp")
+
+-- Capabilities de nvim-cmp para TODOS los servers (sin cargar nvim-cmp)
+vim.lsp.config("*", {
+  capabilities = require("cmp_nvim_lsp").default_capabilities(),
+})
 
 -- ============================================================
 -- Mason
@@ -10,12 +14,15 @@ local cmpcfg = require("config.cmp")
 mason.setup()
 
 mason_lspconfig.setup({
-  ensure_installed = { "biome", "eslint", "lua_ls", "tailwindcss" }
+  ensure_installed = { "biome", "eslint", "lua_ls", "tailwindcss" },
+  -- Los servers se habilitan a mano abajo. Con automatic_enable (default en
+  -- mason-lspconfig v2) se habilita TODO lo instalado en Mason (ej. ts_ls,
+  -- que duplicaría a typescript-tools).
+  automatic_enable = false,
 })
 
 -- Tailwind LSP (with cn/cva/clsx support for shadcn/ui)
 vim.lsp.config("tailwindcss", {
-  capabilities = cmpcfg.capabilities,
   settings = {
     tailwindCSS = {
       experimental = {
@@ -34,7 +41,6 @@ vim.lsp.enable("tailwindcss")
 
 -- lua_ls: Neovim config aware
 vim.lsp.config("lua_ls", {
-  capabilities = cmpcfg.capabilities,
   settings = {
     Lua = {
       runtime = { version = "LuaJIT" },
@@ -48,11 +54,6 @@ vim.lsp.config("lua_ls", {
   },
 })
 vim.lsp.enable("lua_ls")
-
--- ⚠️ IMPORTANTE:
--- Desactivamos eslint por defecto.
--- Solo lo activamos si el proyecto realmente lo necesita.
-vim.lsp.enable("eslint", false)
 
 -- ============================================================
 -- Keymaps comunes — aplican a TODOS los LSP via LspAttach
@@ -70,63 +71,32 @@ vim.api.nvim_create_autocmd("LspAttach", {
     nmap("<leader>rn", vim.lsp.buf.rename, "Rename")
     nmap("<leader>ca", vim.lsp.buf.code_action, "Code actions")
 
-    nmap("<leader>d", vim.diagnostic.open_float, "Diagnostics")
-    nmap("[d", vim.diagnostic.goto_prev, "Prev diagnostic")
-    nmap("]d", vim.diagnostic.goto_next, "Next diagnostic")
+    -- <leader>dd (no <leader>d): <leader>d también es prefijo de <leader>dl/dL
+    -- y nvim esperaba timeoutlen antes de ejecutar el mapping.
+    nmap("<leader>dd", vim.diagnostic.open_float, "Diagnostics")
+    nmap("[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, "Prev diagnostic")
+    nmap("]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, "Next diagnostic")
   end,
 })
 
 -- ============================================================
 -- Biome / ESLint (mutuamente excluyentes)
 -- ============================================================
+-- Ambos configs de lspconfig solo arrancan si encuentran su archivo de
+-- config (biome.json / eslint.config.*). Encima, ESLint no arranca en
+-- proyectos con Biome. La decisión es por buffer, así abrir archivos de
+-- proyectos distintos no prende/apaga los servers globalmente.
 
-local function stop_client(bufnr, name)
-  for _, client in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
-    if client.name == name then
-      client.stop()
-    end
-  end
+vim.lsp.config("eslint", { settings = { format = false } })
+
+local eslint_root_dir = vim.lsp.config.eslint.root_dir
+if type(eslint_root_dir) == "function" then
+  vim.lsp.config("eslint", {
+    root_dir = function(bufnr, on_dir)
+      if tools.detect(bufnr).use_biome then return end
+      eslint_root_dir(bufnr, on_dir)
+    end,
+  })
 end
 
--- Track which servers have been fully configured so we don't call
--- vim.lsp.config() + vim.lsp.enable() on every JS/TS buffer open.
-local _server_initialized = {}
-local function enable_server(server_name)
-  if _server_initialized[server_name] then return end
-  _server_initialized[server_name] = true
-  local cfg = { capabilities = cmpcfg.capabilities }
-  if server_name == "eslint" then
-    cfg.settings = { format = false }
-  end
-  vim.lsp.config(server_name, cfg)
-  vim.lsp.enable(server_name, true)
-end
-
-vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
-  callback = function(args)
-    local ft = vim.bo[args.buf].filetype
-
-    if not (
-      ft == "javascript"
-      or ft == "javascriptreact"
-      or ft == "typescript"
-      or ft == "typescriptreact"
-    ) then
-      return
-    end
-
-    local det = tools.detect(args.buf)
-
-    if det.use_biome then
-      -- Proyecto usa Biome → ESLint apagado
-      stop_client(args.buf, "eslint")
-      vim.lsp.enable("eslint", false)
-      enable_server("biome")
-
-    elseif det.use_eslint then
-      -- Proyecto usa ESLint → lo habilitamos
-      vim.lsp.enable("eslint", true)
-      enable_server("eslint")
-    end
-  end,
-})
+vim.lsp.enable({ "biome", "eslint" })

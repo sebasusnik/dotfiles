@@ -46,8 +46,10 @@ _G._winbar = function()
 
     -- Diagnostics for current buffer (errors + warnings only, subtle)
     local diag_str = ""
-    local errors = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.ERROR })
-    local warns  = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.WARN })
+    -- count() no copia las entradas como get() (esto corre en cada redraw)
+    local counts = vim.diagnostic.count(0)
+    local errors = counts[vim.diagnostic.severity.ERROR] or 0
+    local warns  = counts[vim.diagnostic.severity.WARN] or 0
     if errors > 0 then diag_str = diag_str .. "%#DiagnosticError# " .. errors .. " " end
     if warns  > 0 then diag_str = diag_str .. "%#DiagnosticWarn# " .. warns  .. " " end
 

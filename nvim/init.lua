@@ -41,12 +41,41 @@ require("lazy").setup({
             "nvim-tree/nvim-web-devicons",
             "MunifTanjim/nui.nvim",
         },
+        cmd = "Neotree",
+        keys = {
+            { "<leader>e", "<cmd>Neotree reveal toggle<cr>", desc = "Toggle Neo-tree" },
+            { "-",         "<cmd>Neotree reveal<cr>",        desc = "Reveal in Neo-tree" },
+            { "<leader>o", "<cmd>Neotree reveal focus<cr>",  desc = "Focus Neo-tree" },
+        },
+        -- `nvim .` / `nvim <dir>`: cargar neo-tree para que reemplace a netrw
+        init = function()
+            vim.api.nvim_create_autocmd("BufEnter", {
+                group = vim.api.nvim_create_augroup("NeotreeStartDirectory", { clear = true }),
+                once = true,
+                callback = function()
+                    if package.loaded["neo-tree"] then return end
+                    local stat = vim.uv.fs_stat(vim.fn.argv(0) --[[@as string]])
+                    if stat and stat.type == "directory" then require("neo-tree") end
+                end,
+            })
+        end,
         config = function() require("config.neotree") end,
     },
     {
         "nvim-telescope/telescope.nvim",
         branch = "master",
-        dependencies = { "nvim-lua/plenary.nvim" },
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            -- Sorter nativo en C: mucho más rápido en repos grandes
+            { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+        },
+        cmd = "Telescope",
+        keys = {
+            { "<leader>ff", function() require("telescope.builtin").find_files() end,                desc = "Buscar archivos" },
+            { "<leader>fg", function() require("telescope.builtin").live_grep() end,                 desc = "Buscar texto" },
+            { "<leader>/",  function() require("telescope.builtin").current_buffer_fuzzy_find() end, desc = "Buscar en archivo" },
+            { "<leader>b",  function() require("telescope.builtin").buffers() end,                   desc = "Buscar buffers" },
+        },
         config = function() require("config.telescope") end,
     },
 
@@ -76,7 +105,7 @@ require("lazy").setup({
         "williamboman/mason.nvim",
         cmd = { "Mason", "MasonInstall", "MasonUpdate", "MasonUninstall" },
     },
-    { "williamboman/mason-lspconfig.nvim" },
+    { "williamboman/mason-lspconfig.nvim", lazy = true },
     { "neovim/nvim-lspconfig" },
     {
         "pmizio/typescript-tools.nvim",
@@ -84,29 +113,41 @@ require("lazy").setup({
         ft = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
         config = function()
             require("typescript-tools").setup({
-                capabilities = require("config.cmp").capabilities,
+                capabilities = require("cmp_nvim_lsp").default_capabilities(),
             })
         end,
     },
-    { "nvim-lua/plenary.nvim" },
+    { "nvim-lua/plenary.nvim", lazy = true },
 
     -- ======================
     -- Autocomplete + Snippets
     -- ======================
-    { "hrsh7th/nvim-cmp" },
-    { "hrsh7th/cmp-nvim-lsp" },
-    { "hrsh7th/cmp-path" },
-    { "hrsh7th/cmp-buffer" },
-    { "hrsh7th/cmp-cmdline" },
-    { "L3MON4D3/LuaSnip" },
-    { "saadparwaiz1/cmp_luasnip" },
-    { "rafamadriz/friendly-snippets" },
+    {
+        "hrsh7th/nvim-cmp",
+        event = { "InsertEnter", "CmdlineEnter" },
+        dependencies = {
+            "hrsh7th/cmp-nvim-lsp",
+            "hrsh7th/cmp-path",
+            "hrsh7th/cmp-buffer",
+            "hrsh7th/cmp-cmdline",
+            "saadparwaiz1/cmp_luasnip",
+            "roobert/tailwindcss-colorizer-cmp.nvim",
+            {
+                "L3MON4D3/LuaSnip",
+                dependencies = { "rafamadriz/friendly-snippets" },
+                config = function() require("config.snippets") end,
+            },
+        },
+        config = function() require("config.cmp") end,
+    },
+    -- Solo se usa para las capabilities del LSP (no carga nvim-cmp)
+    { "hrsh7th/cmp-nvim-lsp", lazy = true },
 
     -- ======================
-    -- Formatter / Linter
+    -- Formatter
     -- ======================
-    { "stevearc/conform.nvim" },
-    { "mfussenegger/nvim-lint" },
+    -- Lint: lo hacen los LSP de eslint/biome (ver config/lsp.lua)
+    { "stevearc/conform.nvim", lazy = true, cmd = "ConformInfo", opts = {} },
 
     -- ======================
     -- UI
@@ -114,6 +155,7 @@ require("lazy").setup({
     { "nvim-tree/nvim-web-devicons", lazy = true },
     {
         "zaldih/themery.nvim",
+        priority = 1000, -- aplicar el theme antes que el resto de la UI
         config = function() require("config.themery") end,
     },
     { "catppuccin/nvim",                  name = "catppuccin",  lazy = true },
@@ -136,12 +178,16 @@ require("lazy").setup({
         "nvim-treesitter/nvim-treesitter",
         branch = "main",
         build = ":TSUpdate",
-        -- Defer parser install check past startup; Neovim's built-in loader
-        -- handles the first FileType event via the pre-installed queries.
-        event = "BufReadPost",
+        -- La rama main NO soporta lazy-loading (ver su README)
+        lazy = false,
         config = function() require("config.treesitter") end,
     },
-    { "nvim-treesitter/nvim-treesitter-textobjects", branch = "main", event = "VeryLazy" },
+    {
+        "nvim-treesitter/nvim-treesitter-textobjects",
+        branch = "main",
+        event = "VeryLazy",
+        config = function() require("config.textobjects") end,
+    },
     {
         "windwp/nvim-ts-autotag",
         event = "InsertEnter",
@@ -217,7 +263,12 @@ require("lazy").setup({
         "RRethy/vim-illuminate",
         event = "BufReadPre",
         config = function()
-            require("illuminate").configure({ delay = 200, providers = { "lsp", "treesitter", "regex" } })
+            require("illuminate").configure({
+                delay = 200,
+                providers = { "lsp", "treesitter", "regex" },
+                large_file_cutoff = 3000,
+                filetypes_denylist = { "neo-tree", "TelescopePrompt", "lazy", "mason", "trouble", "help" },
+            })
         end,
     },
     {
@@ -227,7 +278,6 @@ require("lazy").setup({
             require("colorizer").setup({ "*" }, { RGB = true, RRGGBB = true, names = false, css = true })
         end,
     },
-    { "roobert/tailwindcss-colorizer-cmp.nvim", event = "InsertEnter" },
     {
         "lukas-reineke/indent-blankline.nvim",
         event = "BufReadPre",
@@ -288,7 +338,14 @@ require("lazy").setup({
     -- ======================
     {
         "milanglacier/minuet-ai.nvim",
-        dependencies = { "nvim-cmp" },
+        event = "InsertEnter",
+        cmd = "Minuet",
+        keys = {
+            { "<leader>ae", "<cmd>Minuet virtualtext enable<cr>",  desc = "Enable AI completion" },
+            { "<leader>ad", "<cmd>Minuet virtualtext disable<cr>", desc = "Disable AI completion" },
+            { "<leader>at", "<cmd>Minuet virtualtext toggle<cr>",  desc = "Toggle AI completion" },
+            { "<leader>am", "<cmd>Minuet change_model<cr>",        desc = "Change AI model" },
+        },
         config = function() require("config.minuet") end,
     },
 
@@ -301,29 +358,27 @@ require("lazy").setup({
         config = function() require("config.session") end,
     },
 
+}, {
+    performance = {
+        rtp = {
+            -- Plugins built-in que no se usan (netrw lo reemplaza neo-tree)
+            disabled_plugins = { "gzip", "netrwPlugin", "tarPlugin", "tohtml", "tutor", "zipPlugin" },
+        },
+    },
 })
 
 -- ============================================
 -- 4) MÓDULOS (post-plugins)
 -- ============================================
 require("config.project_tools")
-require("config.cmp")
--- Defer LSP setup to BufReadPre so mason-lspconfig.setup(), vim.lsp.config()
--- and vim.lsp.enable() don't run during startup before any file is opened.
-vim.api.nvim_create_autocmd("BufReadPre", {
+-- Defer LSP setup until the first real file is opened, so mason-lspconfig,
+-- vim.lsp.config() and vim.lsp.enable() don't run on an empty startup.
+-- BufNewFile cubre `nvim archivo-nuevo.ts` (ahí no hay BufReadPre).
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
     once = true,
     callback = function() require("config.lsp") end,
 })
 require("config.formatting")
-require("config.lint")
-require("config.snippets")
 require("config.ui")
 require("config.ia")
 require("config.filetypes")
-
-vim.defer_fn(function()
-    local ok = pcall(require, "config.textobjects")
-    if not ok then
-        print("⚠️  Textobjects no pudo cargar (¿falta nvim-treesitter-textobjects?)")
-    end
-end, 200)

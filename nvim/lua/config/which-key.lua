@@ -21,13 +21,16 @@ require("which-key").setup({
 require("which-key").add({
   -- Groups
   { "<leader>f",        group = "Find",          icon = { icon = "󰍉", color = "blue" } },
-  { "<leader>g",        group = "Grep",          icon = { icon = "󰛔", color = "yellow" } },
+  { "<leader>ff",       desc = "Find files",     icon = { icon = "󰍉", color = "blue" } },
+  { "<leader>fg",       desc = "Grep text",      icon = { icon = "󰛔", color = "yellow" } },
+  { "<leader>g",        group = "Git",           icon = { icon = "󰊢", color = "orange" } },
   { "<leader>h",        group = "Git Hunks",     icon = { icon = "󰊢", color = "orange" } },
   { "<leader>a",        group = "AI",            icon = { icon = "󰚩", color = "purple" } },
   { "<leader>t",        group = "Theme",         icon = { icon = "󰏘", color = "cyan" } },
   { "<leader>r",        group = "Refactor",      icon = { icon = "󰑕", color = "yellow" } },
   { "<leader>c",        group = "Code",          icon = { icon = "󰅱", color = "azure" } },
   { "<leader>d",        group = "Diagnostics",   icon = { icon = "󰒡", color = "red" } },
+  { "<leader>dd",       desc = "Line diagnostics",  icon = { icon = "󰒡", color = "red" } },
   { "<leader>dl",       desc = "Trouble (project)", icon = { icon = "󰝤", color = "red" } },
   { "<leader>dL",       desc = "Trouble (buffer)",  icon = { icon = "󰝤", color = "orange" } },
   { "<leader>s",        group = "Search/Replace", icon = { icon = "󰛔", color = "blue" } },

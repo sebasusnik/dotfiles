@@ -2,41 +2,37 @@
 -- UI Zen + Craftzdog-like (sin theme)
 -- ============================================
 
--- 0) Visual mode con color más claro
-vim.api.nvim_set_hl(0, "Visual", { bg = "#4a4a4a", fg = "NONE" })
-
--- 0.5) Highlight para marcas visuales guardadas (más claro también)
-vim.api.nvim_set_hl(0, "VisualMarks", { bg = "#3a3a3a", fg = "NONE" })
-
--- Mostrar marcas visuales después de salir del modo visual
+-- 0) Mostrar marcas visuales después de salir del modo visual
+-- (los colores de Visual/VisualMarks están en apply_highlights, más abajo)
 local visual_marks_ns = vim.api.nvim_create_namespace("visual_marks")
 
 vim.api.nvim_create_autocmd("ModeChanged", {
-  pattern = {"*:[vV\x16]*", "[vV\x16]*:*"},
+  pattern = "[vV\x16]*:*",
   callback = function()
-    local mode = vim.fn.mode()
+    -- Si seguimos en visual (ej: v -> V) no hacemos nada
+    if vim.fn.mode():match("[vV\x16]") then return end
 
-    -- Si salimos del modo visual
-    if not mode:match("[vV\x16]") then
-      -- Limpiar highlights anteriores
-      vim.api.nvim_buf_clear_namespace(0, visual_marks_ns, 0, -1)
+    local buf = vim.api.nvim_get_current_buf()
+    vim.api.nvim_buf_clear_namespace(buf, visual_marks_ns, 0, -1)
 
-      -- Obtener marcas visuales
-      local start_line = vim.fn.line("'<") - 1
-      local end_line = vim.fn.line("'>")
+    -- Marcas visuales (0-indexed, end exclusivo)
+    local start_line = vim.fn.line("'<") - 1
+    local end_line = vim.fn.line("'>")
+    if start_line < 0 or end_line <= start_line then return end
 
-      -- Agregar highlight sutil a las líneas seleccionadas
-      if start_line >= 0 and end_line > start_line then
-        for line = start_line, end_line - 1 do
-          vim.api.nvim_buf_add_highlight(0, visual_marks_ns, "VisualMarks", line, 0, -1)
-        end
+    -- Un solo extmark para todo el rango (nvim_buf_add_highlight está deprecado)
+    pcall(vim.api.nvim_buf_set_extmark, buf, visual_marks_ns, start_line, 0, {
+      end_row = end_line,
+      hl_group = "VisualMarks",
+      hl_eol = true,
+    })
 
-        -- Auto-limpiar después de 3 segundos
-        vim.defer_fn(function()
-          vim.api.nvim_buf_clear_namespace(0, visual_marks_ns, 0, -1)
-        end, 3000)
+    -- Auto-limpiar después de 3 segundos (en el MISMO buffer)
+    vim.defer_fn(function()
+      if vim.api.nvim_buf_is_valid(buf) then
+        vim.api.nvim_buf_clear_namespace(buf, visual_marks_ns, 0, -1)
       end
-    end
+    end, 3000)
   end,
 })
 
@@ -63,19 +59,20 @@ vim.diagnostic.config({
   },
 })
 
--- 3) Bordes rounded para TODO floating preview + treesitter injection in hover buffers
+-- 3) Hover de CSS (tailwind/cssls): mostrarlo como CSS puro.
+-- Solo si el hover es un bloque ```css: antes matcheaba cualquier `{ a: b }`
+-- y los hovers de tipos de TypeScript terminaban highlighteados como CSS.
+-- (El borde rounded de todos los floats lo da `winborder`, más abajo.)
 do
   local orig = vim.lsp.util.open_floating_preview
   ---@diagnostic disable-next-line: duplicate-set-field
   function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
-    opts = opts or {}
-    opts.border = opts.border or "rounded"
     local bufnr, winnr = orig(contents, syntax, opts, ...)
     if syntax == "markdown" and bufnr and vim.api.nvim_buf_is_valid(bufnr) then
       vim.defer_fn(function()
         if not vim.api.nvim_buf_is_valid(bufnr) then return end
-        local text = table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n")
-        if text:match("[%.#]?[%w-]+%s*{[^}]-:[^}]-}") then
+        local first = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1] or ""
+        if first:match("^%s*```css%s*$") then
           -- Strip markdown code-fence lines (```css / ```) that stylize_markdown
           -- leaves in the buffer, then start a CSS treesitter parser.
           local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
@@ -97,112 +94,111 @@ do
   end
 end
 
--- 4) Hover y signature también rounded (extra seguro)
-vim.lsp.handlers["textDocument/hover"] =
-  vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-
-vim.lsp.handlers["textDocument/signatureHelp"] =
-  vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
-
--- 5) Zen: menos “ruido” del UI
+-- 4) Zen: menos “ruido” del UI
 vim.o.winborder = "rounded"
 vim.opt.fillchars = { vert = " ", eob = " " }
 
--- 6) Opcional MUY lindo: mostrar diagnóstico flotante al “descansar” el cursor
+-- 5) Opcional MUY lindo: mostrar diagnóstico flotante al “descansar” el cursor
 -- (sin robar foco, re zen)
 vim.opt.updatetime = 350
 vim.api.nvim_create_autocmd("CursorHold", {
   callback = function()
+    -- No tapar un float que ya esté abierto (hover con K, signature, etc.).
+    -- Los no-focusables (fidget, el propio float de diagnósticos) no cuentan.
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+      local cfg = vim.api.nvim_win_get_config(win)
+      if cfg.relative ~= "" and cfg.focusable then return end
+    end
     vim.diagnostic.open_float(nil, { focusable = false })
   end,
 })
 
-local function transparent()
+-- Saca el fondo de un highlight SIN perder el resto (fg, bold, etc).
+-- nvim_set_hl reemplaza la definición entera: { bg = "NONE" } solo borraba
+-- también el fg (ej: los signos de gitsigns perdían el color).
+local function clear_bg(name)
+  local def = vim.api.nvim_get_hl(0, { name = name, link = false })
+  def.bg = nil
+  def.ctermbg = nil
+  vim.api.nvim_set_hl(0, name, def)
+end
+
+local hl = function(name, val) vim.api.nvim_set_hl(0, name, val) end
+
+-- Todos los colores custom en un solo lugar. Se re-aplican en cada
+-- ColorScheme: `:colorscheme` (themery) hace `hi clear` y borraba los que
+-- estaban seteados una sola vez en gitsigns.lua / neotree.lua.
+local function apply_highlights()
+  -- Selección visual con color más claro + marcas al salir de visual
+  hl("Visual",      { bg = "#4a4a4a" })
+  hl("VisualMarks", { bg = "#3a3a3a" })
+
   -- Editor background
-  vim.api.nvim_set_hl(0, "Normal",      { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "NormalNC",    { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "SignColumn",  { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "MsgArea",     { bg = "NONE" })
+  hl("Normal",      { bg = "NONE" })
+  hl("NormalNC",    { bg = "NONE" })
+  hl("EndOfBuffer", { bg = "NONE" })
+  hl("MsgArea",     { bg = "NONE" })
+  clear_bg("SignColumn")
 
   -- Line numbers (subtle, current line slightly brighter)
-  vim.api.nvim_set_hl(0, "LineNr",       { bg = "NONE", fg = "#555555" })
-  vim.api.nvim_set_hl(0, "LineNrAbove",  { bg = "NONE", fg = "#555555" })
-  vim.api.nvim_set_hl(0, "LineNrBelow",  { bg = "NONE", fg = "#555555" })
-  vim.api.nvim_set_hl(0, "CursorLineNr", { bg = "NONE", fg = "#888888", bold = false })
+  hl("LineNr",       { fg = "#555555" })
+  hl("LineNrAbove",  { fg = "#555555" })
+  hl("LineNrBelow",  { fg = "#555555" })
+  hl("CursorLineNr", { fg = "#888888" })
 
   -- Indent guides (faint line, current scope slightly brighter)
-  vim.api.nvim_set_hl(0, "IblIndent", { fg = "#303030", nocombine = true })
-  vim.api.nvim_set_hl(0, "IblScope",  { fg = "#505050", nocombine = true })
+  hl("IblIndent", { fg = "#303030", nocombine = true })
+  hl("IblScope",  { fg = "#505050", nocombine = true })
 
   -- Trailing whitespace
-  vim.api.nvim_set_hl(0, "TrailingWhitespace", { bg = "#3d2020" })
+  hl("TrailingWhitespace", { bg = "#3d2020" })
 
   -- Floating windows
-  vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "FloatBorder", { bg = "NONE" })
+  clear_bg("NormalFloat")
+  clear_bg("FloatBorder")
 
-  -- Neo-tree specific
-  vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "NeoTreeVertSplit", { bg = "NONE", fg = "NONE" })
-  vim.api.nvim_set_hl(0, "NeoTreeWinSeparator", { bg = "NONE", fg = "NONE" })
+  -- Window separators (invisibles)
+  hl("VertSplit",    { bg = "NONE", fg = "NONE" })
+  hl("WinSeparator", { bg = "NONE", fg = "NONE" })
 
-  -- General window separators
-  vim.api.nvim_set_hl(0, "VertSplit", { bg = "NONE", fg = "NONE" })
-  vim.api.nvim_set_hl(0, "WinSeparator", { bg = "NONE", fg = "NONE" })
+  -- Neo-tree
+  hl("NeoTreeNormal",       { bg = "NONE" })
+  hl("NeoTreeNormalNC",     { bg = "NONE" })
+  hl("NeoTreeEndOfBuffer",  { bg = "NONE" })
+  hl("NeoTreeVertSplit",    { bg = "NONE", fg = "NONE" })
+  hl("NeoTreeWinSeparator", { bg = "NONE", fg = "NONE" })
+  hl("NeoTreeCursorLine",   { bg = "#2a2a3a" })
+  -- Archivos/carpetas filtrados (gitignored, node_modules, etc.) apagados
+  hl("NeoTreeDimText",      { fg = "#4a4a5a", italic = true })
 
-  -- Git signs (keep foreground colors, remove background)
-  vim.api.nvim_set_hl(0, "GitSignsAdd", { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "GitSignsChange", { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "GitSignsDelete", { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "GitSignsTopdelete", { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "GitSignsChangedelete", { bg = "NONE" })
-  vim.api.nvim_set_hl(0, "GitSignsUntracked", { bg = "NONE" })
+  -- Git signs (mismos colores que la scrollbar, ver config/scrollbar.lua)
+  hl("GitSignsAdd",    { fg = "#22aaaa" }) -- cyan
+  hl("GitSignsChange", { fg = "#cc7722" }) -- orange
+  hl("GitSignsDelete", { fg = "#994466" }) -- rose
+  clear_bg("GitSignsTopdelete")
+  clear_bg("GitSignsChangedelete")
+  clear_bg("GitSignsUntracked")
+
+  -- Diagnósticos: undercurl (más compatible con Ghostty)
+  hl("DiagnosticUnderlineError", { sp = "#ff5f5f", undercurl = true })
+  hl("DiagnosticUnderlineWarn",  { sp = "#ffaf5f", undercurl = true })
+  hl("DiagnosticUnderlineInfo",  { sp = "#5fafd7", undercurl = true })
+  hl("DiagnosticUnderlineHint",  { sp = "#5fd787", undercurl = true })
+  -- TypeScript específicos
+  hl("DiagnosticUnnecessary",    { sp = "#808080", undercurl = true })
+  hl("DiagnosticDeprecated",     { sp = "#d75f00", undercurl = true })
 end
 
-transparent()
-vim.api.nvim_create_autocmd("ColorScheme", { callback = transparent })
+apply_highlights()
+vim.api.nvim_create_autocmd("ColorScheme", {
+  -- schedule: correr después de los ColorScheme de los plugins (neo-tree
+  -- re-define sus grupos ahí)
+  callback = function() vim.schedule(apply_highlights) end,
+})
 
--- 7) Habilitar soporte de undercurl en terminal
-vim.o.termguicolors = true
-
--- Configurar secuencias de escape para undercurl (crítico para Ghostty)
+-- 6) Secuencias de escape para undercurl (crítico para Ghostty)
 vim.cmd([[let &t_Cs = "\e[4:3m"]])
 vim.cmd([[let &t_Ce = "\e[4:0m"]])
-
--- 8) Configurar underline para diagnósticos (más compatible)
-local function set_diagnostics_hl()
-  vim.api.nvim_set_hl(0, "DiagnosticUnderlineError", {
-    sp = "#ff5f5f",
-    undercurl = true
-  })
-  vim.api.nvim_set_hl(0, "DiagnosticUnderlineWarn", {
-    sp = "#ffaf5f",
-    undercurl = true
-  })
-  vim.api.nvim_set_hl(0, "DiagnosticUnderlineInfo", {
-    sp = "#5fafd7",
-    undercurl = true
-  })
-  vim.api.nvim_set_hl(0, "DiagnosticUnderlineHint", {
-    sp = "#5fd787",
-    undercurl = true
-  })
-  -- TypeScript específicos
-  vim.api.nvim_set_hl(0, "DiagnosticUnnecessary", {
-    sp = "#808080",
-    undercurl = true
-  })
-  vim.api.nvim_set_hl(0, "DiagnosticDeprecated", {
-    sp = "#d75f00",
-    undercurl = true
-  })
-end
-
-set_diagnostics_hl()
-vim.api.nvim_create_autocmd("ColorScheme", { callback = set_diagnostics_hl })
 
 -- Trailing whitespace highlight
 vim.fn.matchadd("TrailingWhitespace", [[\s\+$]])

@@ -154,7 +154,6 @@ end
 -- Obtener path relativo del archivo actual
 local function get_relative_path()
   local full_path = vim.fn.expand('%:p')
-  local cwd = vim.fn.getcwd()
   -- Obtener path relativo desde el cwd
   local relative = vim.fn.fnamemodify(full_path, ':~:.')
   return relative
@@ -334,9 +333,10 @@ end, { desc = 'Buscar palabra' })
 -- Enviar cambios git del archivo actual
 vim.keymap.set('n', '<leader>ag', function()
   local file = vim.fn.expand('%')
-  local diff = vim.fn.system('git diff ' .. file)
+  -- Lista de args (sin shell): paths con espacios/caracteres raros no rompen
+  local diff = vim.fn.system({ 'git', 'diff', '--', file })
   if diff == '' then
-    diff = vim.fn.system('git diff --cached ' .. file)
+    diff = vim.fn.system({ 'git', 'diff', '--cached', '--', file })
   end
   if diff == '' then
     print("⚠️  No hay cambios git en este archivo")

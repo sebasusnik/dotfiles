@@ -1,9 +1,5 @@
-local conform = require("conform")
+-- conform.nvim se carga recién al primer format (ver init.lua)
 local tools = require("config.project_tools")
-
-conform.setup({
-  -- dejamos setup vacío; decidimos al vuelo
-})
 
 local function choose_formatter(bufnr)
   local det = tools.detect(bufnr)
@@ -20,11 +16,11 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     local fmt = choose_formatter(args.buf)
     if not fmt then return end
 
-    conform.format({
+    require("conform").format({
       bufnr = args.buf,
       formatters = fmt,
       timeout_ms = 2000,
-      lsp_fallback = false,
+      lsp_format = "never",
     })
   end,
 })
@@ -36,5 +32,5 @@ vim.keymap.set("n", "<leader>p", function()
     vim.notify("No encontré biome/prettier config en este proyecto", vim.log.levels.WARN)
     return
   end
-  conform.format({ bufnr = bufnr, formatters = fmt })
+  require("conform").format({ bufnr = bufnr, formatters = fmt, lsp_format = "never" })
 end, { desc = "Formatear (auto por proyecto)" })

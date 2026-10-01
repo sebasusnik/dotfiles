@@ -1,8 +1,12 @@
 local cmp = require("cmp")
 local luasnip = require("luasnip")
 
--- snippets “tipo VSCode” (React/TS/etc)
-require("luasnip.loaders.from_vscode").lazy_load()
+-- Sugerencia inline de minuet visible? (minuet carga en InsertEnter y puede
+-- no estar configurado si faltan las env vars)
+local function minuet_visible()
+  local ok, vt = pcall(require, "minuet.virtualtext")
+  return ok and vt.action.is_visible()
+end
 
 local tw_colorizer = require("tailwindcss-colorizer-cmp")
 
@@ -24,8 +28,9 @@ cmp.setup({
         cmp.select_next_item()
       elseif luasnip.expand_or_jumpable() then
         luasnip.expand_or_jump()
+      elseif minuet_visible() then
+        require("minuet.virtualtext").action.accept()
       else
-        -- Let minuet handle Tab if it has a suggestion, otherwise fallback
         fallback()
       end
     end, { "i", "s" }),
@@ -35,6 +40,8 @@ cmp.setup({
         cmp.select_prev_item()
       elseif luasnip.jumpable(-1) then
         luasnip.jump(-1)
+      elseif minuet_visible() then
+        require("minuet.virtualtext").action.dismiss()
       else
         fallback()
       end
@@ -60,8 +67,3 @@ cmp.setup.cmdline("/", {
   mapping = cmp.mapping.preset.cmdline(),
   sources = { { name = "buffer" } },
 })
-
--- Exportamos capabilities para LSP
-local M = {}
-M.capabilities = require("cmp_nvim_lsp").default_capabilities()
-return M

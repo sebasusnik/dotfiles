@@ -18,8 +18,9 @@ o               Toggle folder expand/collapse
 
 ### Telescope (Fuzzy Search)
 ```
-<leader>f       Find files
-<leader>g       Search text in project (live grep)
+<leader>ff      Find files
+<leader>fg      Search text in project (live grep)
+<leader>fx      Open current file with the system app
 <leader>/       Search in current file
 <leader>b       Search open buffers
 <leader>*       Search word under cursor in project
@@ -28,6 +29,14 @@ Inside Telescope:
 <Esc>           Close
 <C-j>           Next result
 <C-k>           Previous result
+```
+
+### Diagnostics (LSP)
+```
+<leader>dd      Show diagnostics for current line
+[d / ]d         Previous / next diagnostic
+<leader>dl      Trouble: project diagnostics
+<leader>dL      Trouble: buffer diagnostics
 ```
 
 ## ✏️ Editing Enhancements

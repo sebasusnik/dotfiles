@@ -19,6 +19,9 @@ local function move_down()
       local start = visual_selection.start_line
       local end_line = visual_selection.end_line
 
+      -- No mover si ya estamos en la última línea (E16: Invalid range)
+      if end_line >= vim.api.nvim_buf_line_count(0) then return end
+
       -- Mover las líneas
       vim.cmd(string.format("%d,%dm %d", start, end_line, end_line + 1))
 
@@ -29,8 +32,9 @@ local function move_down()
       -- Mover el cursor a la primera línea del bloque movido
       vim.api.nvim_win_set_cursor(0, {visual_selection.start_line, 0})
    else
-      -- Mover línea actual
+      -- Mover línea actual (salvo que sea la última: E16: Invalid range)
       local current_line = vim.api.nvim_win_get_cursor(0)[1]
+      if current_line >= vim.api.nvim_buf_line_count(0) then return end
       vim.cmd("m .+1")
       vim.api.nvim_win_set_cursor(0, {current_line + 1, 0})
    end
@@ -112,154 +116,10 @@ end, { desc = 'Mover líneas (hydra)' })
 -- Navega por funciones, types, variables, etc.
 -- ============================================
 
--- Tipos de nodos válidos para navegar
-local valid_node_types = {
-   "function_declaration",
-   "method_definition",
-   "function_expression",
-   "arrow_function",
-   "lexical_declaration",      -- const/let
-   "variable_declaration",      -- var
-   "type_alias_declaration",    -- type
-   "interface_declaration",     -- interface
-   "enum_declaration",          -- enum
-   "class_declaration",         -- class
-}
-
-local function is_valid_node(node)
-   if not node then return false end
-   local node_type = node:type()
-   for _, valid_type in ipairs(valid_node_types) do
-      if node_type == valid_type then return true end
-   end
-   -- Incluir export_statement si su hijo es válido
-   if node_type == "export_statement" then
-      for child in node:iter_children() do
-         if is_valid_node(child) then return true end
-      end
-   end
-   return false
-end
-
--- Navegar al siguiente nodo válido
-local function goto_next_declaration()
-   -- Verificar tipo de archivo compatible
-   local ft = vim.bo.filetype
-   local supported_filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" }
-   local is_supported = false
-   for _, supported_ft in ipairs(supported_filetypes) do
-      if ft == supported_ft then
-         is_supported = true
-         break
-      end
-   end
-
-   if not is_supported then
-      vim.notify("Navegación solo disponible en archivos TS/JS", vim.log.levels.INFO)
-      return
-   end
-
-   local bufnr = 0
-   local cursor = vim.api.nvim_win_get_cursor(0)
-   local current_row = cursor[1] - 1  -- 0-indexed
-
-   local ok, parser = pcall(vim.treesitter.get_parser, bufnr)
-   if not ok or not parser then
-      vim.notify("Treesitter no disponible para este archivo", vim.log.levels.WARN)
-      return
-   end
-
-   local trees = parser:parse()
-   if not trees or #trees == 0 then return end
-
-   local root = trees[1]:root()
-   local best_node ---@type TSNode?
-   local best_row = math.huge
-
-   -- Función recursiva para visitar nodos
-   local function visit(n)
-      if is_valid_node(n) then
-         local row = n:range()
-         if row > current_row and row < best_row then
-            best_node = n
-            best_row = row
-         end
-      end
-      for child in n:iter_children() do
-         visit(child)
-      end
-   end
-
-   -- Recorrer todos los nodos del árbol
-   for node in root:iter_children() do
-      visit(node)
-   end
-
-   if best_node then
-      local row = best_node:range()
-      vim.api.nvim_win_set_cursor(0, {row + 1, 0})
-   end
-end
-
--- Navegar al anterior nodo válido
-local function goto_prev_declaration()
-   -- Verificar tipo de archivo compatible
-   local ft = vim.bo.filetype
-   local supported_filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" }
-   local is_supported = false
-   for _, supported_ft in ipairs(supported_filetypes) do
-      if ft == supported_ft then
-         is_supported = true
-         break
-      end
-   end
-
-   if not is_supported then
-      vim.notify("Navegación solo disponible en archivos TS/JS", vim.log.levels.INFO)
-      return
-   end
-
-   local bufnr = 0
-   local cursor = vim.api.nvim_win_get_cursor(0)
-   local current_row = cursor[1] - 1  -- 0-indexed
-
-   local ok, parser = pcall(vim.treesitter.get_parser, bufnr)
-   if not ok or not parser then
-      vim.notify("Treesitter no disponible para este archivo", vim.log.levels.WARN)
-      return
-   end
-
-   local trees = parser:parse()
-   if not trees or #trees == 0 then return end
-
-   local root = trees[1]:root()
-   local best_node ---@type TSNode?
-   local best_row = -1
-
-   -- Función recursiva para visitar nodos
-   local function visit(n)
-      if is_valid_node(n) then
-         local row = n:range()
-         if row < current_row and row > best_row then
-            best_node = n
-            best_row = row
-         end
-      end
-      for child in n:iter_children() do
-         visit(child)
-      end
-   end
-
-   -- Recorrer todos los nodos del árbol
-   for node in root:iter_children() do
-      visit(node)
-   end
-
-   if best_node then
-      local row = best_node:range()
-      vim.api.nvim_win_set_cursor(0, {row + 1, 0})
-   end
-end
+-- Implementación compartida con ]m / [m: config/ts_nav.lua
+local ts_nav = require("config.ts_nav")
+local function goto_next_declaration() ts_nav.goto_declaration(1) end
+local function goto_prev_declaration() ts_nav.goto_declaration(-1) end
 
 local nav_hydra = Hydra({
    name = 'Navigate Declarations',

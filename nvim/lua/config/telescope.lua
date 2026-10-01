@@ -3,8 +3,11 @@
 -- TELESCOPE: Búsqueda fuzzy
 -- ============================================
 
-local builtin = require("telescope.builtin")
 local actions = require("telescope.actions")
+
+-- Excluidos directo en rg (antes: file_ignore_patterns, que filtra en Lua
+-- entrada por entrada DESPUÉS de listar todo, incluido .git/ por --hidden)
+local excludes = { "--glob=!.git/", "--glob=!node_modules/", "--glob=!dist/", "--glob=!build/" }
 
 require("telescope").setup({
   defaults = {
@@ -15,13 +18,7 @@ require("telescope").setup({
         ["<C-k>"] = actions.move_selection_previous,
       },
     },
-    file_ignore_patterns = {
-      "node_modules/",
-      ".git/",
-      "dist/",
-      "build/",
-    },
-    vimgrep_arguments = {
+    vimgrep_arguments = vim.list_extend({
       "rg",
       "--color=never",
       "--no-heading",
@@ -30,15 +27,11 @@ require("telescope").setup({
       "--column",
       "--smart-case",
       "--hidden",
-      "--glob=!.git/",
-      "--glob=!node_modules/",
-      "--glob=!dist/",
-      "--glob=!build/",
-    },
+    }, excludes),
   },
   pickers = {
     find_files = {
-      hidden = true,
+      find_command = vim.list_extend({ "rg", "--files", "--color=never", "--hidden" }, excludes),
       previewer = false,
     },
     live_grep = {
@@ -53,8 +46,7 @@ require("telescope").setup({
   },
 })
 
--- Keymaps
-vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "Buscar archivos" })
-vim.keymap.set("n", "<leader>g", builtin.live_grep, { desc = "Buscar texto" })
-vim.keymap.set("n", "<leader>/", builtin.current_buffer_fuzzy_find, { desc = "Buscar en archivo" })
-vim.keymap.set("n", "<leader>b", builtin.buffers, { desc = "Buscar buffers" })
+-- Sorter nativo (C). pcall: si falló el `make` del build, sigue andando.
+pcall(require("telescope").load_extension, "fzf")
+
+-- Keymaps (<leader>ff, <leader>fg, <leader>/, <leader>b): init.lua (lazy keys)

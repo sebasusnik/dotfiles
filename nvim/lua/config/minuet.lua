@@ -40,9 +40,9 @@ require("minuet").setup({
     -- Auto-trigger for all filetypes (use {'*'} for all, or specify like {'python', 'lua'})
     auto_trigger_ft = { '*' },
     keymap = {
-      accept = '<Tab>',           -- Accept whole completion
+      -- <Tab>/<S-Tab> (aceptar/descartar) los maneja config/cmp.lua: si minuet
+      -- los mapea, sin sugerencia visible el <Tab> no inserta nada.
       accept_line = '<A-a>',      -- Accept one line (Alt-a)
-      dismiss = '<S-Tab>',        -- Dismiss suggestion
       prev = '<A-[>',             -- Previous suggestion (Alt-[)
       next = '<A-]>',             -- Next suggestion (Alt-])
     },
@@ -61,8 +61,4 @@ require("minuet").setup({
 -- :Minuet virtualtext toggle  - Toggle virtual text mode
 -- :Minuet change_model        - Change AI model interactively
 
--- Keybindings
-vim.keymap.set('n', '<leader>ae', '<cmd>Minuet virtualtext enable<cr>', { desc = "Enable AI completion" })
-vim.keymap.set('n', '<leader>ad', '<cmd>Minuet virtualtext disable<cr>', { desc = "Disable AI completion" })
-vim.keymap.set('n', '<leader>at', '<cmd>Minuet virtualtext toggle<cr>', { desc = "Toggle AI completion" })
-vim.keymap.set('n', '<leader>am', '<cmd>Minuet change_model<cr>', { desc = "Change AI model" })
+-- Keybindings (<leader>ae/ad/at/am): definidos en init.lua (lazy keys)

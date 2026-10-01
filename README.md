@@ -18,7 +18,7 @@ Minimalist and zen configuration for development with Neovim, Tmux, Claude Code/
 - 📁 File explorer with native git colors (neo-tree)
 - ✍️ Autocompletion with nvim-cmp
 - 🎯 Treesitter for syntax highlighting
-- 🔧 Formatting with conform.nvim and linting with nvim-lint
+- 🔧 Formatting with conform.nvim, linting via the ESLint/Biome language servers
 - 🌿 Git integration with gitsigns
 - 🧘 Zen mode for focus
 
@@ -509,7 +509,7 @@ See [docs/KEYBINDINGS.md](docs/KEYBINDINGS.md) for all shortcuts, but the most u
 - `<Space>ac` - Send visual selection to AI
 - `<Space>af` - Send current function to AI
 - `<Space>aa` - Send entire file to AI
-- `<Space>ad` - Send git diff to AI
+- `<Space>ag` - Send git diff to AI
 
 ### Tmux copy mode:
 
